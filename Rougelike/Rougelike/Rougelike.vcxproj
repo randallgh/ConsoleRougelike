@@ -113,6 +113,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Map.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="point2D.h" />
   </ItemGroup>
