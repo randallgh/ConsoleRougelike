@@ -78,15 +78,33 @@ void displayMap()
 
 }
 
+char input = ' ';
+//char inputArray[2];
+
+char lastInput = ' ';
+
+void inputSwitch();
+
 void playerMove()
 {
 	map[playerX][playerY] = ground;
 	printf("Move player: \n");
-	
-	char input = ' ';
+
 	std::cin >> input;
+	//std::cin.get(inputArray, 2);
+	//input = inputArray[0];
 
 	printf("Player Cords: %d, %d \n", playerX, playerY);
+
+	inputSwitch();
+
+	printf("Player Cords: %d, %d \n", playerX, playerY);
+
+	map[playerX][playerY] = playerChar;
+}
+
+void inputSwitch()
+{
 	switch (input)
 	{
 	case 'w':
@@ -96,6 +114,7 @@ void playerMove()
 		if (playerY > mapHeight - 1) {
 			playerY--;
 		}
+		lastInput = 'w';
 		break;
 	case 'a':
 	case 'A':
@@ -104,6 +123,7 @@ void playerMove()
 		if (playerX < 0) {
 			playerX++;
 		}
+		lastInput = 'a';
 		break;
 	case 's':
 	case 'S':
@@ -112,6 +132,7 @@ void playerMove()
 		if (playerY < 0) {
 			playerY++;
 		}
+		lastInput = 's';
 		break;
 	case 'd':
 	case 'D':
@@ -120,15 +141,16 @@ void playerMove()
 		if (playerX > mapWidth - 1) {
 			playerX--;
 		}
+		lastInput = 'd';
 		break;
 	case 'e':
 	case 'E':
 		isRunning = false;
 		break;
+	case ' ':
+		inputSwitch();
+		break;
 	default:
 		break;
 	}
-	printf("Player Cords: %d, %d \n", playerX, playerY);
-
-	map[playerX][playerY] = playerChar;
 }
