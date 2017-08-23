@@ -117,7 +117,6 @@ int main()
 			//Move player
 			if (player.hasMoved) {
 				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = '.';
-				mapData[player.position.x + WIDTH * player.position.y] = player.character;
 			}
 
 			//Move enemies
@@ -127,6 +126,8 @@ int main()
 			//Check for collison
 			//If the positons of both the enemy and player are the same COLLIDE and start battle
 			checkPlayerCollison();
+
+			mapData[player.position.x + WIDTH * player.position.y] = player.character;
 			break;
 
 		case BATTLE:
