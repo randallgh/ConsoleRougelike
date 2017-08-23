@@ -4,9 +4,10 @@
 #include <chrono>
 
 #include "Player.h"
+#include "Enemy.h"
 
 /*---------------------------------------------------------------------*/
-//Rendering
+//RENDERING
 #define WIDTH 70
 #define HEIGHT 35
 
@@ -36,14 +37,27 @@ enum GameStates
 	BATTLE
 };
 
+GameStates gameState = OVERWORLD;
+
 
 /*---------------------------------------------------------------------*/
-//Data
+//DATA
+bool isRunning = true;
+
+//Map
 char mapData[WIDTH * HEIGHT];
 
+//UI
+char uiData[WIDTH * HEIGHT];
+
+//Player
 Player player;
 char previousChar = '.';
 int previousPos = 0;
+
+//Enemies
+Enemy enemies[10];
+Enemy slime = {20, 5, 'S'};
 
 /*---------------------------------------------------------------------*/
 
@@ -74,16 +88,18 @@ int main()
 		mapData[i] = '.';
 	}
 
+	//Add enemies to map
+	enemies[0] = copyEnemy(slime);
+	enemies[0].position = { 10, 10 };
+
 	//Add player to pos
-	mapData[0] = player.character;
+	mapData[player.position.x * player.position.y] = player.character;
 
 
 
 
 
 
-
-	bool isRunning = true;
 
 	//Game Loop
 	while (isRunning) {
@@ -98,7 +114,10 @@ int main()
 			mapData[player.position.x + WIDTH * player.position.y] = player.character;
 		}
 
+		//Move enemies
+		mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
 
+		//Render
 		render();
 
 		Sleep(50);
@@ -110,6 +129,7 @@ int main()
 
 void render()
 {
+	char tempChar;
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) {
 
@@ -174,4 +194,15 @@ void input() {
 
 		player.hasMoved = true;
 	}
+
+	if (GetAsyncKeyState(VK_ESCAPE)) {
+		isRunning = false;
+	}
+
+
+}
+
+void ai() 
+{
+	
 }
