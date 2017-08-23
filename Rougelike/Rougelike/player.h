@@ -1,6 +1,6 @@
 #pragma once
 
-#include "point2D.h"
+#include "Point2D.h"
 
 struct Player
 {

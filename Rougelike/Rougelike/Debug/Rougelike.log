@@ -1,4 +1,11 @@
-﻿  main.cpp
+﻿  point2D.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\player.h(14): error C3646: 'position': unknown override specifier
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\player.h(14): error C2059: syntax error: '='
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\player.h(14): error C2334: unexpected token(s) preceding '{'; skipping apparent function body
+  main.cpp
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\main.cpp(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  Rougelike.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Rougelike.exe
-  Rougelike.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Rougelike.pdb (Partial PDB)
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\map.h(21): error C2061: syntax error: identifier 'Player'
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\main.cpp(111): error C2660: 'generateBlankFlatMap': function does not take 2 arguments
+  Map.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\map.h(21): error C2061: syntax error: identifier 'Player'
+  Generating Code...

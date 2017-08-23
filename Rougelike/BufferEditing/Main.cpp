@@ -34,7 +34,7 @@ int main(void)
 	rHnd = GetStdHandle(STD_INPUT_HANDLE);
 
 	/* Set the console's title */
-	SetConsoleTitle("Our shiny new title!");
+	SetConsoleTitle("Rougelike");
 
 	/* Set the window size */
 	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);

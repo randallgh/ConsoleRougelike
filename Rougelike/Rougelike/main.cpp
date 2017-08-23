@@ -1,9 +1,12 @@
 #include <iostream>
-#include <Windows.h>::Sleep
+#include <Windows.h>
 
-#include "player.h"
-#include "point2D.h"
+#include "Player.h"
+#include "Point2D.h"
 #include "Map.h"
+
+#define WIDTH 70
+#define HEIGHT 35
 /*
 Map data/class?
 File IO
@@ -21,20 +24,27 @@ Item data/class
 Player player;
 Map currentMap;
 
-//int playerX = 0;
-//int player.position.y = 0;
-
-char playerChar = '@';
-char ground = '.';
-
 bool isRunning = true;
 
-void generateBlankMap(Map *map);
 void playerMove();
 void displayMap();
 
-#include <windows.h>
+HANDLE wHnd; /* write (output) handle */
+HANDLE rHnd; /* read (input handle */
 
+/* A CHAR_INFO structure containing data about a single character */
+CHAR_INFO consoleBuffer[WIDTH * HEIGHT];
+
+/* Window size coordinates, be sure to start index at zero! */
+SMALL_RECT windowSize = { 0, 0, WIDTH - 1, HEIGHT - 1 };
+
+/* A COORD struct for specificying the console's screen buffer dimensions */
+COORD bufferSize = { WIDTH, HEIGHT };
+
+/* Setting up different variables for passing to WriteConsoleOutput */
+COORD characterBufferSize = { WIDTH, HEIGHT };
+COORD characterPosition = { 0, 0 };
+SMALL_RECT consoleWriteArea = { 0, 0, WIDTH - 1, HEIGHT - 1 };
 
 /* http://www.cplusplus.com/forum/articles/10515/ */
 void ClearScreen()
@@ -65,6 +75,7 @@ void ClearScreen()
 	if (!FillConsoleOutputAttribute(
 		hStdOut,
 		csbi.wAttributes,
+
 		cellCount,
 		homeCoords,
 		&count
@@ -76,15 +87,29 @@ void ClearScreen()
 
 int main()
 {
-	//Main game loop here, loop until the player asks to quit
-	//currentMap = generateBlankMap(currentMap);
-	currentMap.pointer = &currentMap;
+	/* initialize handles */
+	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
+	rHnd = GetStdHandle(STD_INPUT_HANDLE);
 
-	generateBlankMap(currentMap.pointer);
+	/* Set the console's title */
+	SetConsoleTitle("Rougelike");
+
+	/* Set the window size */
+	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
+
+	/* Set the screen's buffer size */
+	SetConsoleScreenBufferSize(wHnd, bufferSize);
+
+	//Main game loop here, loop until the player asks to quit
+
+	//Make a pointer for the map
+	currentMap.pointer = &currentMap;
+	//generateBlankMap(currentMap.pointer, player);
+	generateBlankFlatMap(currentMap.pointer, player);
 
 	while (isRunning) {
 		displayMap();
-		printf("Current Pos: %d, %d \n", player.position.x, player.position.y);
+		//printf("Current Pos: %d, %d \n", player.position.x, player.position.y);
 		playerMove();
 		ClearScreen();
 	}
@@ -93,47 +118,65 @@ int main()
 	return 0;
 }
 
-void generateBlankMap(Map *map)
-{
-	//Add ground to map
-
-	for (int y = 0; y < (*map).height; y++)
-	{
-		for (int x = 0; x < (*map).width; x++)
-		{
-			(*map).map[x][y] = ground;
-		}
-	}
-
-	//Add player to pos
-	(*map).map[player.position.x][player.position.y] = playerChar;
-}
-
 void displayMap()
 {
 	//Print out map
-	for (int y = currentMap.height-1; y >= 0; y--)
+
+	//for (int y = currentMap.height-1; y >= 0; y--)
+	//{
+	//	for (int x = 0; x < currentMap.width; x++)
+	//	{
+	//		std::cout << currentMap.map[x][y];
+	//	}
+	//	std::cout << std::endl;
+	//}
+
+	int y, x;
+
+	char tempChar = '.';
+	WORD charInfo = 14;
+
+	for (y = 0; y < HEIGHT; ++y)
 	{
-		for (int x = 0; x < currentMap.width; x++)
+		for (x = 0; x < WIDTH; ++x)
 		{
-			std::cout << currentMap.map[x][y];
+			//Get the char from the map
+			//tempChar = currentMap.map[x][(HEIGHT - 1) - y];
+			tempChar = currentMap.data[x + WIDTH * ((HEIGHT - 1) - y)];
+
+			switch (tempChar)
+			{
+			case '.':
+				charInfo = 10;
+				tempChar = '.';
+				break;
+			case '@':
+				charInfo = 15;
+				tempChar = '@';
+				break;
+			default:
+				break;
+			}
+
+			consoleBuffer[x + WIDTH * y].Char.AsciiChar = (unsigned char)tempChar;
+			consoleBuffer[x + WIDTH * y].Attributes = charInfo;
 		}
-		std::cout << std::endl;
 	}
 
+	WriteConsoleOutputA(wHnd, consoleBuffer, characterBufferSize, characterPosition, &consoleWriteArea);
 }
 
 char input = ' ';
 //char inputArray[2];
-
 char lastInput = ' ';
-
 void inputSwitch();
 
 void playerMove()
 {
-	currentMap.map[player.position.x][player.position.y] = ground;
-	printf("Move player: \n");
+	//currentMap.map[player.position.x][player.position.y] = currentMap.ground;
+	currentMap.data[flatArrayIndex(player.position, currentMap)] = currentMap.ground;
+
+	printf("Move player: ");
 
 	std::cin >> input;
 	//std::cin.get(inputArray, 2);
@@ -141,7 +184,8 @@ void playerMove()
 
 	inputSwitch();
 
-	currentMap.map[player.position.x][player.position.y] = playerChar;
+	//currentMap.map[player.position.x][player.position.y] = player.character;
+	currentMap.data[flatArrayIndex(player.position, currentMap)] = player.character;
 }
 
 void inputSwitch()

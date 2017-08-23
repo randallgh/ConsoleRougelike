@@ -1,11 +1,21 @@
 #pragma once
 
+#include "Map.h"
+#include "Player.h"
+
 struct Map
 {
-	int width = 64;
-	int height = 20;
+	int width = 70;
+	int height = 35;
 
-	char map[64][20] = {};
+	//char map[70][35] = {};
+	char data[70 * 35] = {};
 
 	Map* pointer;
+
+	char playerChar = '@';
+	char ground = '.';
 };
+
+//void generateBlankMap(Map *map, Player player);
+void generateBlankFlatMap(Map *map, Player player);
