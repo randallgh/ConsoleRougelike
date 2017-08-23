@@ -66,6 +66,8 @@ Enemy slime = {20, 5, 'S'};
 void render();
 void overworldInput();
 void checkPlayerCollison();
+void ai();
+
 
 int main()
 {
@@ -94,10 +96,11 @@ int main()
 	//Add enemies to map
 	enemies[0] = copyEnemy(slime);
 	enemies[0].position = { 10, 10 };
+	enemies[0].pointer = &enemies[0];
 
 	//Add player to pos
 	mapData[player.position.x * player.position.y] = player.character;
-
+	player.pointer = &player;
 
 
 
@@ -113,11 +116,12 @@ int main()
 
 			//Move player
 			if (player.hasMoved) {
-				mapData[previousPos] = '.';
+				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = '.';
 				mapData[player.position.x + WIDTH * player.position.y] = player.character;
 			}
 
 			//Move enemies
+			ai();
 			mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
 
 			//Check for collison
@@ -148,7 +152,6 @@ void render()
 	char tempChar;
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) {
-
 		for (x = 0; x < WIDTH; ++x) {
 			consoleBuffer[x + WIDTH * y].Char.AsciiChar = mapData[x + WIDTH * ((HEIGHT - 1) - y)];
 			consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
@@ -165,7 +168,8 @@ void overworldInput() {
 	if (GetAsyncKeyState(VK_UP))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		previousPos = (player.position.x + WIDTH * player.position.y);
+		setPreviousPosition(player.pointer, player.position);
+		//previousPos = (player.position.x + WIDTH * player.position.y);
 
 		player.position.y++;
 
@@ -177,7 +181,8 @@ void overworldInput() {
 	} else if (GetAsyncKeyState(VK_DOWN))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		previousPos = (player.position.x + WIDTH * player.position.y);
+		setPreviousPosition(player.pointer, player.position);
+		//previousPos = (player.position.x + WIDTH * player.position.y);
 
 		player.position.y--;
 
@@ -189,7 +194,8 @@ void overworldInput() {
 	} else if (GetAsyncKeyState(VK_RIGHT))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		previousPos = (player.position.x + WIDTH * player.position.y);
+		setPreviousPosition(player.pointer, player.position);
+		//previousPos = (player.position.x + WIDTH * player.position.y);
 
 		player.position.x++;
 
@@ -201,7 +207,8 @@ void overworldInput() {
 	} else if (GetAsyncKeyState(VK_LEFT))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		previousPos = (player.position.x + WIDTH * player.position.y);
+		setPreviousPosition(player.pointer, player.position);
+		//previousPos = (player.position.x + WIDTH * player.position.y);
 
 		player.position.x--;
 
@@ -219,7 +226,9 @@ void overworldInput() {
 
 void ai() 
 {
-	
+	for (int i = 0; i < ENEMIESLENGTH; i++) {
+		setPreviousPosition(enemies[i].pointer, enemies[i].position);
+	}
 }
 
 void checkPlayerCollison() {
@@ -230,6 +239,9 @@ void checkPlayerCollison() {
 
 			player.character = 'X';
 			enemies[i].character = 'O';
+
+			setPosition(player.pointer, player.positionPrevious);
+			setPosition(enemies[i].pointer, enemies[i].positionPrevious);
 		}
 	}
 }
