@@ -56,13 +56,16 @@ char previousChar = '.';
 int previousPos = 0;
 
 //Enemies
-Enemy enemies[10];
+#define ENEMIESLENGTH 1
+
+Enemy enemies[ENEMIESLENGTH];
 Enemy slime = {20, 5, 'S'};
 
 /*---------------------------------------------------------------------*/
 
 void render();
-void input();
+void overworldInput();
+void checkPlayerCollison();
 
 int main()
 {
@@ -99,28 +102,41 @@ int main()
 
 
 
-
-
 	//Game Loop
 	while (isRunning) {
 
-		//Playermovement
+		switch (gameState)
+		{
+		case OVERWORLD:
+			//Playermovement
+			overworldInput();
 
-		input();
+			//Move player
+			if (player.hasMoved) {
+				mapData[previousPos] = '.';
+				mapData[player.position.x + WIDTH * player.position.y] = player.character;
+			}
 
-		//Move player
-		if (player.hasMoved) {
-			mapData[previousPos] = '.';
-			mapData[player.position.x + WIDTH * player.position.y] = player.character;
+			//Move enemies
+			mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
+
+			//Check for collison
+			//If the positons of both the enemy and player are the same COLLIDE and start battle
+			checkPlayerCollison();
+			break;
+
+		case BATTLE:
+
+
+			break;
+		default:
+			break;
 		}
-
-		//Move enemies
-		mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
 
 		//Render
 		render();
 
-		Sleep(50);
+		Sleep(100);
 
 
 		
@@ -143,7 +159,8 @@ void render()
 	WriteConsoleOutputA(wHnd, consoleBuffer, characterBufferSize, characterPosition, &consoleWriteArea);
 }
 
-void input() {
+void overworldInput() {
+
 
 	if (GetAsyncKeyState(VK_UP))
 	{
@@ -198,11 +215,21 @@ void input() {
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		isRunning = false;
 	}
-
-
 }
 
 void ai() 
 {
 	
+}
+
+void checkPlayerCollison() {
+	//If the player and the enemy(unknown which one) have the same positon
+	for (int i = 0; i < ENEMIESLENGTH; i++) {
+		if ((player.position.x == enemies[i].position.x) 
+			&& (player.position.y == enemies[i].position.y)) {
+
+			player.character = 'X';
+			enemies[i].character = 'O';
+		}
+	}
 }
