@@ -1,0 +1,4 @@
+﻿  Main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(55): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
+  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)
