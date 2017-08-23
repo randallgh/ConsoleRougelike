@@ -11,5 +11,5 @@ struct Player
 
 	char character = '@';
 
-	Point2D position;
+	Point2D position = { 0,0 };
 };

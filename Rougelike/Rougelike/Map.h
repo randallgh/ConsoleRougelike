@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Map.h"
-#include "Player.h"
-
 struct Map
 {
 	int width = 70;
