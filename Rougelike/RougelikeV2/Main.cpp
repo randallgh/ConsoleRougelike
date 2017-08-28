@@ -8,8 +8,13 @@
 
 /*---------------------------------------------------------------------*/
 //RENDERING
-#define WIDTH 70
-#define HEIGHT 35
+#define WIDTH 80 //70
+#define HEIGHT 50 //35
+
+#define MAPHEIGHT 40 //Uses the same width as the screen
+#define UIHEIGHT 10 //Uses the same width as the screen
+
+
 
 HANDLE wHnd; /* write (output) handle */
 HANDLE rHnd; /* read (input handle */
@@ -40,22 +45,19 @@ enum GameStates
 GameStates gameState = OVERWORLD;
 
 
-/*---------------------------------------------------------------------*/
-//DATA
+/*-------------------------------DATA----------------------------------*/
 bool isRunning = true;
 
-//Map
-char mapData[WIDTH * HEIGHT];
+/*-----Map-----*/
+char mapData[WIDTH * MAPHEIGHT];
 
-//UI
-char uiData[WIDTH * HEIGHT];
+/*-----UI-----*/
+char uiData[WIDTH * UIHEIGHT];
 
-//Player
+/*-----Player-----*/
 Player player;
-char previousChar = '.';
-int previousPos = 0;
 
-//Enemies
+/*-----Enemies-----*/
 #define ENEMIESLENGTH 1
 
 Enemy enemies[ENEMIESLENGTH];
@@ -88,24 +90,35 @@ int main()
 
 	//Map Generation
 
-	for (int i = 0; i < HEIGHT * WIDTH; i++)
+	for (int i = 0; i < MAPHEIGHT * WIDTH; i++)
 	{
 		mapData[i] = '.';
 	}
 
+	//UI Generation
+	for (int i = 0; i < UIHEIGHT * WIDTH; i++) 
+	{
+		uiData[i] = ' ';
+	}
+
+	for (int i = 0; i < 10; i++) {
+		uiData[i] = i + 65;
+	}
+
 	//Add enemies to map
 	enemies[0] = copyEnemy(slime);
-	enemies[0].position = { 10, 10 };
+	enemies[0].position = { 10, 20 };
 	enemies[0].pointer = &enemies[0];
 
 	//Add player to pos
-	mapData[player.position.x * player.position.y] = player.character;
+	player.position = { 11, 11 };
+	//mapData[player.position.x * player.position.y] = player.character;
 	player.pointer = &player;
 
 
 
 
-	//Game Loop
+	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
 
 		switch (gameState)
@@ -121,17 +134,14 @@ int main()
 
 			//Move enemies
 			ai();
-			mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
 
 			//Check for collison
 			//If the positons of both the enemy and player are the same COLLIDE and start battle
 			checkPlayerCollison();
 
-			mapData[player.position.x + WIDTH * player.position.y] = player.character;
 			break;
 
 		case BATTLE:
-
 
 			break;
 		default:
@@ -139,22 +149,35 @@ int main()
 		}
 
 		//Render
+		for (Enemy element : enemies) {
+			mapData[element.position.x + WIDTH * element.position.y] = element.character;
+		}
+		//mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
+		mapData[player.position.x + WIDTH * player.position.y] = player.character;
+
 		render();
 
 		Sleep(100);
-
-
-		
 	}
 }
 
+//Takes whatever is in mapData and adds it to the console buffer
 void render()
 {
 	char tempChar;
 	int y, x;
-	for (y = 0; y < HEIGHT; ++y) {
-		for (x = 0; x < WIDTH; ++x) {
-			consoleBuffer[x + WIDTH * y].Char.AsciiChar = mapData[x + WIDTH * ((HEIGHT - 1) - y)];
+	for (y = 0; y < HEIGHT; ++y) 
+	{
+		for (x = 0; x < WIDTH; ++x) 
+		{
+			//(x + WIDTH * ((MAPHEIGHT - 1) - y)) >= 
+			if ((x + WIDTH * ((MAPHEIGHT - 1) - y))  >= 0) {
+				consoleBuffer[x + WIDTH * y].Char.AsciiChar = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+			} 
+			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
+				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
+			}
+
 			consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 		}
 	}
@@ -174,8 +197,8 @@ void overworldInput() {
 
 		player.position.y++;
 
-		if (player.position.y >= HEIGHT) {
-			player.position.y = (HEIGHT - 1);
+		if (player.position.y >= MAPHEIGHT) {
+			player.position.y = (MAPHEIGHT - 1);
 		}
 
 		player.hasMoved = true;
@@ -227,13 +250,23 @@ void overworldInput() {
 
 void ai() 
 {
+	/*
+	Set the previous positon
+	Find where enemy wants to go
+		-Find player
+		-Are they close enough
+		-Choose the quickest route to the player
+	*/
+
 	for (int i = 0; i < ENEMIESLENGTH; i++) {
 		setPreviousPosition(enemies[i].pointer, enemies[i].position);
 	}
 }
 
 void checkPlayerCollison() {
-	//If the player and the enemy(unknown which one) have the same positon
+	//If the player and any enemy have the same positon
+
+	//Enemy Collison
 	for (int i = 0; i < ENEMIESLENGTH; i++) {
 		if ((player.position.x == enemies[i].position.x) 
 			&& (player.position.y == enemies[i].position.y)) {
@@ -245,4 +278,6 @@ void checkPlayerCollison() {
 			setPosition(enemies[i].pointer, enemies[i].positionPrevious);
 		}
 	}
+
+	//Wall Collsion
 }
