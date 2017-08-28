@@ -51,6 +51,8 @@ bool isRunning = true;
 /*-----Map-----*/
 char mapData[WIDTH * MAPHEIGHT];
 
+char ground = 249;
+
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
 
@@ -73,8 +75,6 @@ void ai();
 
 int main()
 {
-	srand(time(0));
-
 	/* initialize handles */
 	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
 	rHnd = GetStdHandle(STD_INPUT_HANDLE);
@@ -90,19 +90,27 @@ int main()
 
 	//Map Generation
 
-	for (int i = 0; i < MAPHEIGHT * WIDTH; i++)
+	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
 	{
-		mapData[i] = '.';
+		mapData[i] = ground;
 	}
 
 	//UI Generation
-	for (int i = 0; i < UIHEIGHT * WIDTH; i++) 
+	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
 	{
 		uiData[i] = ' ';
 	}
 
-	for (int i = 0; i < 10; i++) {
-		uiData[i] = i + 65;
+	//Need a line of characters at the top of the UI box
+	for (int y = 0; y < UIHEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
+			if (y > 8) {
+				uiData[x + WIDTH * y] = 205;
+			}
+			if ((x >= 0 && y >= 8) && (x <= 9 && y <= 8)) {
+				uiData[x + WIDTH * y] = x + 48;
+			}
+		}
 	}
 
 	//Add enemies to map
@@ -121,6 +129,8 @@ int main()
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
 
+		srand(time(0));
+
 		switch (gameState)
 		{
 		case OVERWORLD:
@@ -129,7 +139,7 @@ int main()
 
 			//Move player
 			if (player.hasMoved) {
-				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = '.';
+				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = ground;
 			}
 
 			//Move enemies
@@ -170,15 +180,14 @@ void render()
 	{
 		for (x = 0; x < WIDTH; ++x) 
 		{
-			//(x + WIDTH * ((MAPHEIGHT - 1) - y)) >= 
 			if ((x + WIDTH * ((MAPHEIGHT - 1) - y))  >= 0) {
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+				consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
 			} 
 			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
+				consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 			}
-
-			consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
 		}
 	}
 
@@ -258,7 +267,7 @@ void ai()
 		-Choose the quickest route to the player
 	*/
 
-	for (int i = 0; i < ENEMIESLENGTH; i++) {
+	for (int i = 0; i < ENEMIESLENGTH; ++i) {
 		setPreviousPosition(enemies[i].pointer, enemies[i].position);
 	}
 }
@@ -267,11 +276,11 @@ void checkPlayerCollison() {
 	//If the player and any enemy have the same positon
 
 	//Enemy Collison
-	for (int i = 0; i < ENEMIESLENGTH; i++) {
+	for (int i = 0; i < ENEMIESLENGTH; ++i) {
 		if ((player.position.x == enemies[i].position.x) 
 			&& (player.position.y == enemies[i].position.y)) {
 
-			player.character = 'X';
+			player.character = 'K';
 			enemies[i].character = 'O';
 
 			setPosition(player.pointer, player.positionPrevious);

@@ -1,7 +1,9 @@
 ﻿  Main.cpp
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\player.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\enemy.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(76): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(167): warning C4101: 'tempChar': unreferenced local variable
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(54): warning C4309: 'initializing': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(108): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(132): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(177): warning C4101: 'tempChar': unreferenced local variable
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)
