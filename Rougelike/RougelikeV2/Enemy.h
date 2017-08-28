@@ -8,6 +8,8 @@ struct Enemy
 	int attack;
 	char character;
 
+	bool hasMoved;
+
 	WORD characterColor;
 
 	Vector2D position;

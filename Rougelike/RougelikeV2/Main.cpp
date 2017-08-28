@@ -104,10 +104,19 @@ int main()
 	//Need a line of characters at the top of the UI box
 	for (int y = 0; y < UIHEIGHT; ++y) {
 		for (int x = 0; x < WIDTH; ++x) {
-			if (y > 8) {
+			if (y == 9) {
 				uiData[x + WIDTH * y] = 205;
 			}
 			if ((x >= 0 && y >= 8) && (x <= 9 && y <= 8)) {
+				uiData[x + WIDTH * y] = x + 48;
+			}
+			if (x == 50) {
+				uiData[x + WIDTH * y] = 186;
+			}
+			if (x == 50 && y == 9) {
+				uiData[x + WIDTH * y] = 203;
+			}
+			if ((x >= 51 && y >= 8) && (x <= 61 && y <= 8)) {
 				uiData[x + WIDTH * y] = x + 48;
 			}
 		}
@@ -141,6 +150,7 @@ int main()
 			if (player.hasMoved) {
 				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = ground;
 			}
+
 
 			//Move enemies
 			ai();
@@ -197,8 +207,83 @@ void render()
 
 void overworldInput() {
 
+	//North East
+	if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_RIGHT))
+	{
+		setPreviousPosition(player.pointer, player.position);
+		
+		++player.position.y;
+		++player.position.x;
 
-	if (GetAsyncKeyState(VK_UP))
+		if (player.position.y >= MAPHEIGHT) {
+			player.position.y = (MAPHEIGHT - 1);
+
+		}
+
+		if (player.position.x >= WIDTH) {
+			player.position.x = (WIDTH - 1);
+		}
+
+		player.hasMoved = true;
+
+	}
+	//South East
+	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_RIGHT))
+	{
+		setPreviousPosition(player.pointer, player.position);
+
+		--player.position.y;
+		++player.position.x;
+		
+
+		if (player.position.y <= 0) {
+			player.position.y = 0;
+		}
+
+		if (player.position.x >= WIDTH) {
+			player.position.x = (WIDTH - 1);
+		}
+
+	}
+	//South West
+	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_LEFT))
+	{
+		setPreviousPosition(player.pointer, player.position);
+
+		--player.position.y;
+		--player.position.x;
+
+		if (player.position.y <= 0) {
+			player.position.y = 0;
+		}
+
+		if (player.position.x < 0) {
+			player.position.x = 0;
+		}
+
+
+
+	}
+	//North West
+	else if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_LEFT))
+	{
+		setPreviousPosition(player.pointer, player.position);
+
+		++player.position.y;
+		--player.position.x;
+
+		if (player.position.y >= MAPHEIGHT) {
+			player.position.y = (MAPHEIGHT - 1);
+
+		}
+
+		if (player.position.x < 0) {
+			player.position.x = 0;
+		}
+
+	}
+	//North
+	else if (GetAsyncKeyState(VK_UP))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
@@ -211,7 +296,9 @@ void overworldInput() {
 		}
 
 		player.hasMoved = true;
-	} else if (GetAsyncKeyState(VK_DOWN))
+	}
+	//South
+	else if (GetAsyncKeyState(VK_DOWN))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
@@ -224,7 +311,9 @@ void overworldInput() {
 		}
 
 		player.hasMoved = true;
-	} else if (GetAsyncKeyState(VK_RIGHT))
+	}
+	//East
+	else if (GetAsyncKeyState(VK_RIGHT))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
@@ -237,7 +326,9 @@ void overworldInput() {
 		}
 
 		player.hasMoved = true;
-	} else if (GetAsyncKeyState(VK_LEFT))
+	}
+	//West
+	else if (GetAsyncKeyState(VK_LEFT))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
@@ -259,6 +350,10 @@ void overworldInput() {
 
 void ai() 
 {
+	for (int i = 0; i < ENEMIESLENGTH; ++i) {
+		setPreviousPosition(enemies[i].pointer, enemies[i].position);
+		mapData[vectorToFlatArray(enemies[i].positionPrevious, WIDTH)] = ground;
+	}
 	/*
 	Set the previous positon
 	Find where enemy wants to go
@@ -266,9 +361,25 @@ void ai()
 		-Are they close enough
 		-Choose the quickest route to the player
 	*/
-
-	for (int i = 0; i < ENEMIESLENGTH; ++i) {
-		setPreviousPosition(enemies[i].pointer, enemies[i].position);
+	if (distanceVector2D(enemies[0].position, player.position) > 2) {
+		if (enemies[0].position.x == player.position.x) {
+			if (enemies[0].position.y < player.position.y) {
+				enemies[0].position.y++;
+			} 
+			else 
+			{
+				enemies[0].position.y--;
+			}
+		}
+		else if (enemies[0].position.y == player.position.y) {
+			if (enemies[0].position.x < player.position.x) {
+				enemies[0].position.x++;
+			}
+			else
+			{
+				enemies[0].position.x--;
+			}
+		}
 	}
 }
 
