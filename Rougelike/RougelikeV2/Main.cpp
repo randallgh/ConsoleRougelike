@@ -3,6 +3,9 @@
 #include <stdlib.h> /* included for rand */
 #include <chrono>
 
+#include <iostream>
+#include <string>
+
 #include "Player.h"
 #include "Enemy.h"
 
@@ -58,6 +61,9 @@ char uiData[WIDTH * UIHEIGHT];
 
 Vector2D playerHealthUIStart = { 59, 8 };
 
+#define PLAYERHEALTHLENGTH 9
+char healthA[PLAYERHEALTHLENGTH] = {};
+
 /*-----Player-----*/
 Player player;
 
@@ -77,6 +83,9 @@ bool input();
 void checkPlayerCollison();
 void ai();
 
+//Player UI
+void printPlayerHealth();
+void damagePlayer(int damage);
 
 int main()
 {
@@ -141,12 +150,17 @@ int main()
 	enemies[0].position = { 10, 20 };
 	enemies[0].pointer = &enemies[0];
 
+	/*enemies[1] = copyEnemy(slime);
+	enemies[1].position = { 20,20 };
+	enemies[1].pointer = &enemies[1];*/
+
 	//Add player to pos
 	player.position = { 0, 0 };
 	//mapData[player.position.x * player.position.y] = player.character;
 	player.pointer = &player;
 
-
+	//First player health element
+	damagePlayer(0);
 
 
 	/*---------------------------Game Loop--------------------------*/
@@ -165,6 +179,7 @@ int main()
 
 			//Move enemies
 			ai();
+
 
 			//Check for collison
 			//If the positons of both the enemy and player are the same COLLIDE and start battle
@@ -185,18 +200,21 @@ int main()
 			break;
 		}
 
+
 		//Render
 		for (Enemy element : enemies) {
 			mapData[element.position.x + WIDTH * element.position.y] = element.character;
 		}
-		//mapData[enemies[0].position.x + WIDTH * enemies[0].position.y] = enemies[0].character;
+
 		mapData[player.position.x + WIDTH * player.position.y] = player.character;
 
 		render();
 
-		Sleep(100);
+		Sleep(30);
 	}
 }
+
+
 
 //Takes whatever is in mapData and adds it to the console buffer
 void render()
@@ -213,7 +231,7 @@ void render()
 			} 
 			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
-				consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+				consoleBuffer[x + WIDTH * y].Attributes = 15 | FOREGROUND_INTENSITY;
 			}
 		}
 	}
@@ -369,6 +387,11 @@ bool input() {
 		isRunning = false;
 	}
 
+	if (GetAsyncKeyState(VK_OEM_PERIOD)) {
+		damagePlayer(10);
+	}
+
+
 	if (gameState == BATTLE) {
 		//Button to melee attack
 		if (GetAsyncKeyState(0x45)) {
@@ -393,50 +416,58 @@ void ai()
 		-Are they close enough
 		-Choose the quickest route to the player
 	*/
-	float distance = distanceVector2D(enemies[0].position, player.position);
+	float distance;
+	for (int i = 0; i < ENEMIESLENGTH; ++i) 
+	{
+		 distance = distanceVector2D(enemies[i].position, player.position);
 
-	if ( distance > 1 && distance < 15) {
-		gameState = BATTLE;
-		if (enemies[0].position.x == player.position.x) {
-			if (enemies[0].position.y < player.position.y) {
-				enemies[0].position.y++;
-			} 
-			else 
-			{
-				enemies[0].position.y--;
+		if (distance > 1 && distance < 15) {
+			gameState = BATTLE;
+			if (enemies[i].position.x == player.position.x) {
+				if (enemies[i].position.y < player.position.y) {
+					enemies[i].position.y++;
+				}
+				else
+				{
+					enemies[i].position.y--;
+				}
 			}
-		}
-		else if (enemies[0].position.y == player.position.y) {
-			if (enemies[0].position.x < player.position.x) 
-			{
-				enemies[0].position.x++;
+			else if (enemies[i].position.y == player.position.y) {
+				if (enemies[i].position.x < player.position.x)
+				{
+					enemies[i].position.x++;
+				}
+				else
+				{
+					enemies[i].position.x--;
+				}
 			}
-			else
+			else if (enemies[i].position.y < player.position.y && enemies[i].position.x < player.position.x)
 			{
-				enemies[0].position.x--;
+				enemies[i].position.y++;
+				enemies[i].position.x++;
 			}
-		} 
-		else if(enemies[0].position.y < player.position.y && enemies[0].position.x < player.position.x)
-		{
-			enemies[0].position.y++;
-			enemies[0].position.x++;
-		} 
-		else if(enemies[0].position.y > player.position.y && enemies[0].position.x > player.position.x)
-		{
-			enemies[0].position.y--;
-			enemies[0].position.x--;
-		}
-		else if (enemies[0].position.y > player.position.y && enemies[0].position.x < player.position.x) 
-		{
-			--enemies[0].position.y;
-			++enemies[0].position.x;
-		}
-		else if (enemies[0].position.y < player.position.y && enemies[0].position.x > player.position.x) 
-		{
-			++enemies[0].position.y;
-			--enemies[0].position.x;
+			else if (enemies[i].position.y > player.position.y && enemies[i].position.x > player.position.x)
+			{
+				enemies[i].position.y--;
+				enemies[i].position.x--;
+			}
+			else if (enemies[i].position.y > player.position.y && enemies[i].position.x < player.position.x)
+			{
+				--enemies[i].position.y;
+				++enemies[i].position.x;
+			}
+			else if (enemies[i].position.y < player.position.y && enemies[i].position.x > player.position.x)
+			{
+				++enemies[i].position.y;
+				--enemies[i].position.x;
+			}
 		}
 	}
+
+
+
+
 }
 
 void checkPlayerCollison() {
@@ -459,10 +490,31 @@ void checkPlayerCollison() {
 	//Wall Collsion
 }
 
+void damagePlayer(int damage) 
+{
+	player.health -= damage;
+	printPlayerHealth();
+}
+
+
+//Call this only when the player takes damage
 void printPlayerHealth() 
 {
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i) {
+		healthA[i] = ' ';
+	}
+	
+	std::string health = std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+
+	health.resize(PLAYERHEALTHLENGTH);
+
+	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i)
 	{
-		//uiData[playerHealthUIStart.x * WIDTH * playerHealthUIStart.y + i] = ;
+		healthA[i] = health.at(i);
+	}
+
+	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i)
+	{
+		uiData[playerHealthUIStart.x + WIDTH * playerHealthUIStart.y + i] = healthA[i];
 	}
 }

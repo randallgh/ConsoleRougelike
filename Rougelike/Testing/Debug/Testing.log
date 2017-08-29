@@ -1,0 +1,4 @@
+﻿  main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\testing\main.cpp(47): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  Testing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Testing.exe
+  Testing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Testing.pdb (Partial PDB)
