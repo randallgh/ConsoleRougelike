@@ -114,6 +114,7 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Message.cpp" />
+    <ClCompile Include="MessageBoxUI.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Vector2D.cpp" />
   </ItemGroup>
@@ -121,6 +122,7 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Message.h" />
+    <ClInclude Include="MessageBoxUI.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Vector2D.h" />
   </ItemGroup>

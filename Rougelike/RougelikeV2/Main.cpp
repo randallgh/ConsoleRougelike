@@ -9,6 +9,7 @@
 #include "Player.h"
 #include "Enemy.h"
 #include "Message.h"
+#include "MessageBoxUI.h"
 
 /*---------------------------------------------------------------------*/
 //RENDERING
@@ -66,7 +67,8 @@ Vector2D playerHealthUIStart = { 59, 8 };
 char healthA[PLAYERHEALTHLENGTH] = {};
 
 //UI Messagebox x: 0 - 49 y: 0 - 8
-int maxMessages = 8;
+
+MessageBoxUI messageBox({0,0});
 
 //  PrintMessage("Player moved right")
 //std::string wMes = "Welcome";
@@ -178,10 +180,10 @@ int main()
 	printPlayerHealth();
 
 	//Print welcome message
-	UIrenderCharA(welcome.data, 50, { 0,0 });
-	UIrenderCharA(welcome.data, 50, { 0,1 });
-	UIrenderCharA(welcome.data, 50, { 0,2 });
-	UIrenderCharA(welcome.data, 50, { 0,3 });
+	UIrenderCharA(welcome.data, welcome.length, { 0,0 });
+	UIrenderCharA(welcome.data, welcome.length, { 0,1 });
+	UIrenderCharA(welcome.data, welcome.length, { 0,2 });
+	UIrenderCharA(welcome.data, welcome.length, { 0,3 });
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -409,6 +411,7 @@ bool input() {
 
 	if (GetAsyncKeyState(VK_OEM_PERIOD)) {
 		damagePlayer(10);
+		messageBox.Clear(uiData, WIDTH, 50);
 	}
 
 
@@ -540,8 +543,5 @@ void printPlayerHealth()
 		healthA[i] = health.at(i);
 	}
 
-	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i)
-	{
-		uiData[playerHealthUIStart.x + WIDTH * playerHealthUIStart.y + i] = healthA[i];
-	}
+	UIrenderCharA(healthA, PLAYERHEALTHLENGTH, playerHealthUIStart);
 }
