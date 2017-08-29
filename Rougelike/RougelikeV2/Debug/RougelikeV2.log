@@ -1,6 +1,12 @@
-﻿  MessageBoxUI.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  Main.cpp
+﻿  Main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\player.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\enemy.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(59): warning C4309: 'initializing': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(143): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(149): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(152): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(204): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(259): warning C4101: 'tempChar': unreferenced local variable
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(441): warning C4715: 'input': not all control paths return a value
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)

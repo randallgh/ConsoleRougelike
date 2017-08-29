@@ -74,7 +74,7 @@ MessageBoxUI messageBox({0,0});
 //std::string wMes = "Welcome";
 
 //Message welcome(wMes, 8);
-Message welcome("Welcome!", 9);
+
 
 #define MESSAGELENGTH 50
 /*-----Player-----*/
@@ -180,10 +180,23 @@ int main()
 	printPlayerHealth();
 
 	//Print welcome message
-	UIrenderCharA(welcome.data, welcome.length, { 0,0 });
-	UIrenderCharA(welcome.data, welcome.length, { 0,1 });
-	UIrenderCharA(welcome.data, welcome.length, { 0,2 });
-	UIrenderCharA(welcome.data, welcome.length, { 0,3 });
+	Message welcome("Welcome!", 9);
+	Message test("I'm a bannana!", 15);
+
+	messageBox.messages[0] = welcome;
+	//messageBox.messages[1] = welcome;
+	//messageBox.messages[2] = welcome;
+
+	messageBox.Clear(uiData, WIDTH, 50);
+	//messageBox.Add(welcome);
+	//messageBox.Add(welcome);
+	messageBox.Add(test);
+	//messageBox.Print(uiData, WIDTH, 50);
+
+	//UIrenderCharA(welcome.data, welcome.length, { 0,0 });
+	//UIrenderCharA(welcome.data, welcome.length, { 0,1 });
+	//UIrenderCharA(welcome.data, welcome.length, { 0,2 });
+	//UIrenderCharA(welcome.data, welcome.length, { 0,3 });
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -241,6 +254,8 @@ int main()
 //Takes whatever is in mapData and adds it to the console buffer
 void render()
 {
+	messageBox.Print(uiData, WIDTH, 50);
+
 	char tempChar;
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) 
