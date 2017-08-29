@@ -8,6 +8,7 @@
 
 #include "Player.h"
 #include "Enemy.h"
+#include "Message.h"
 
 /*---------------------------------------------------------------------*/
 //RENDERING
@@ -64,6 +65,16 @@ Vector2D playerHealthUIStart = { 59, 8 };
 #define PLAYERHEALTHLENGTH 9
 char healthA[PLAYERHEALTHLENGTH] = {};
 
+//UI Messagebox x: 0 - 49 y: 0 - 8
+int maxMessages = 8;
+
+//  PrintMessage("Player moved right")
+//std::string wMes = "Welcome";
+
+//Message welcome(wMes, 8);
+Message welcome("Welcome!", 9);
+
+#define MESSAGELENGTH 50
 /*-----Player-----*/
 Player player;
 
@@ -86,6 +97,10 @@ void ai();
 //Player UI
 void printPlayerHealth();
 void damagePlayer(int damage);
+
+//UI
+void UIrenderCharA(char a[], int length, Vector2D pos);
+
 
 int main()
 {
@@ -160,8 +175,13 @@ int main()
 	player.pointer = &player;
 
 	//First player health element
-	damagePlayer(0);
+	printPlayerHealth();
 
+	//Print welcome message
+	UIrenderCharA(welcome.data, 50, { 0,0 });
+	UIrenderCharA(welcome.data, 50, { 0,1 });
+	UIrenderCharA(welcome.data, 50, { 0,2 });
+	UIrenderCharA(welcome.data, 50, { 0,3 });
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -210,7 +230,7 @@ int main()
 
 		render();
 
-		Sleep(30);
+		Sleep(100);
 	}
 }
 
@@ -496,6 +516,13 @@ void damagePlayer(int damage)
 	printPlayerHealth();
 }
 
+void UIrenderCharA(char a[], int length, Vector2D pos) 
+{
+	for (int i = 0; i < length; ++i)
+	{
+		uiData[pos.x + WIDTH * pos.y + i] = a[i];
+	}
+}
 
 //Call this only when the player takes damage
 void printPlayerHealth() 
