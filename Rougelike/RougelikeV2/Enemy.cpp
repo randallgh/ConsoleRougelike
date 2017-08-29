@@ -1,7 +1,14 @@
 #include "Enemy.h"
 
 Enemy copyEnemy(Enemy origin) {
-	Enemy temp = { origin.health, origin.attack, origin.character};
+	Enemy temp = { origin.health, origin.attack, origin.character };
+	temp.isAlive = origin.isAlive;
+	
+	for (int i = 0; i < 10; i++) 
+	{
+		temp.name[i] = origin.name[i];
+	}
+
 	return temp;
 }
 

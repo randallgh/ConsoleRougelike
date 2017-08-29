@@ -84,10 +84,10 @@ Player player;
 #define ENEMIESLENGTH 1
 
 Enemy enemies[ENEMIESLENGTH];
-Enemy slime = {20, 5, 'S'};
+Enemy slime = {20, 5, 'S', "slime", true};
 
 /*----Battle----*/
-Enemy currentEnemy;
+Enemy *currentEnemy;
 
 /*---------------------------------------------------------------------*/
 
@@ -99,6 +99,7 @@ void ai();
 //Player UI
 void printPlayerHealth();
 void damagePlayer(int damage);
+void damageEnemy(int damage);
 
 //UI
 void UIrenderCharA(char a[], int length, Vector2D pos);
@@ -254,6 +255,7 @@ int main()
 //Takes whatever is in mapData and adds it to the console buffer
 void render()
 {
+	messageBox.Clear(uiData, WIDTH, 50);
 	messageBox.Print(uiData, WIDTH, 50);
 
 	char tempChar;
@@ -295,7 +297,7 @@ bool input() {
 		if (player.position.x >= WIDTH) {
 			player.position.x = (WIDTH - 1);
 		}
-
+		player.hasMoved = true;
 		return true;
 
 	}
@@ -315,7 +317,7 @@ bool input() {
 		if (player.position.x >= WIDTH) {
 			player.position.x = (WIDTH - 1);
 		}
-
+		player.hasMoved = true;
 		return true;
 
 	}
@@ -334,7 +336,7 @@ bool input() {
 		if (player.position.x < 0) {
 			player.position.x = 0;
 		}
-
+		player.hasMoved = true;
 		return true;
 
 	}
@@ -354,13 +356,14 @@ bool input() {
 		if (player.position.x < 0) {
 			player.position.x = 0;   
 		}
-
+		player.hasMoved = true;
 		return true;
 
 	}
 	//North
 	else if (GetAsyncKeyState(VK_UP))
 	{
+		
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
 		//previousPos = (player.position.x + WIDTH * player.position.y);
@@ -370,12 +373,15 @@ bool input() {
 		if (player.position.y >= MAPHEIGHT) {
 			player.position.y = (MAPHEIGHT - 1);
 		}
-
+		//Message move("Player moved north.", 20);
+		//messageBox.Add(move);
+		player.hasMoved = true;
 		return true;
 	}
 	//South
 	else if (GetAsyncKeyState(VK_DOWN))
 	{
+		
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
 		//previousPos = (player.position.x + WIDTH * player.position.y);
@@ -385,7 +391,9 @@ bool input() {
 		if (player.position.y <= 0) {
 			player.position.y = 0;
 		}
-
+		//Message move("Player moved south.", 20);
+		//messageBox.Add(move);
+		player.hasMoved = true;
 		return true;
 	}
 	//East
@@ -400,12 +408,15 @@ bool input() {
 		if (player.position.x >= WIDTH) {
 			player.position.x = (WIDTH - 1);
 		}
-
+		//Message move("Player moved east.", 19);
+		//messageBox.Add(move);
+		player.hasMoved = true;
 		return true;
 	}
 	//West
 	else if (GetAsyncKeyState(VK_LEFT))
 	{
+		
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
 		setPreviousPosition(player.pointer, player.position);
 		//previousPos = (player.position.x + WIDTH * player.position.y);
@@ -415,10 +426,15 @@ bool input() {
 		if (player.position.x < 0) {
 			player.position.x = 0;
 		}
-
+		
+		//Message move("Player moved west.", 19);
+		//messageBox.Add(move);
+		player.hasMoved = true;
 		return true;
 
 	}
+
+	player.hasMoved = false;
 
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		isRunning = false;
@@ -431,9 +447,30 @@ bool input() {
 
 
 	if (gameState == BATTLE) {
+		//Find the closest enemy
+		for (Enemy element : enemies) 
+		{
+			if (element.isTargetPlayer) 
+			{
+				currentEnemy = element.pointer;
+			}
+		}
+
 		//Button to melee attack
-		if (GetAsyncKeyState(0x45)) {
+		if (GetAsyncKeyState(0x45)) 
+		{
 			//Attack current enemy
+			if ((*currentEnemy).isAlive)
+			{
+				int distance = distanceVector2D(player.position, (*currentEnemy).position);
+				if (distance <= 2)
+				{
+					messageBox.Add(Message("Damage enemy.", 14));
+
+					damageEnemy(player.attack);
+				}
+			}
+			return true;
 		}
 	}
 
@@ -455,52 +492,74 @@ void ai()
 		-Choose the quickest route to the player
 	*/
 	float distance;
-	for (int i = 0; i < ENEMIESLENGTH; ++i) 
+	for (int i = 0; i < ENEMIESLENGTH; ++i)
 	{
-		 distance = distanceVector2D(enemies[i].position, player.position);
-
-		if (distance > 1 && distance < 15) {
-			gameState = BATTLE;
-			if (enemies[i].position.x == player.position.x) {
-				if (enemies[i].position.y < player.position.y) {
-					enemies[i].position.y++;
-				}
-				else
-				{
-					enemies[i].position.y--;
-				}
-			}
-			else if (enemies[i].position.y == player.position.y) {
-				if (enemies[i].position.x < player.position.x)
-				{
-					enemies[i].position.x++;
-				}
-				else
-				{
-					enemies[i].position.x--;
-				}
-			}
-			else if (enemies[i].position.y < player.position.y && enemies[i].position.x < player.position.x)
-			{
-				enemies[i].position.y++;
-				enemies[i].position.x++;
-			}
-			else if (enemies[i].position.y > player.position.y && enemies[i].position.x > player.position.x)
-			{
-				enemies[i].position.y--;
-				enemies[i].position.x--;
-			}
-			else if (enemies[i].position.y > player.position.y && enemies[i].position.x < player.position.x)
-			{
-				--enemies[i].position.y;
-				++enemies[i].position.x;
-			}
-			else if (enemies[i].position.y < player.position.y && enemies[i].position.x > player.position.x)
-			{
-				++enemies[i].position.y;
-				--enemies[i].position.x;
-			}
-		}
+		Vector2D playerPos = player.positionPrevious;
+		 distance = distanceVector2D(enemies[i].position, playerPos);
+		 
+		 if (enemies[0].isAlive) 
+		 {
+			 if (distance <= 2)
+			 {
+				 //Damageplayer
+				 int damage = enemies[i].attack;
+				 Message attack("Enemy damaged player.", 22);
+				 messageBox.Add(attack);
+				 damagePlayer(damage);
+			 }
+			 else if (distance >= 2 && distance < 15) {
+				 gameState = BATTLE;
+				 enemies[i].isTargetPlayer = true;
+				 //messageBox.Add(Message("Battle start.", 14));
+				 if (enemies[i].position.x == playerPos.x) {
+					 if (enemies[i].position.y < playerPos.y) {
+						 enemies[i].position.y++;
+						 enemies[i].hasMoved = true;
+					 }
+					 else
+					 {
+						 enemies[i].position.y--;
+						 enemies[i].hasMoved = true;
+					 }
+				 }
+				 else if (enemies[i].position.y == playerPos.y) {
+					 if (enemies[i].position.x < playerPos.x)
+					 {
+						 enemies[i].position.x++;
+						 enemies[i].hasMoved = true;
+					 }
+					 else
+					 {
+						 enemies[i].position.x--;
+						 enemies[i].hasMoved = true;
+					 }
+				 }
+				 else if (enemies[i].position.y < playerPos.y && enemies[i].position.x < playerPos.x)
+				 {
+					 enemies[i].position.y++;
+					 enemies[i].position.x++;
+					 enemies[i].hasMoved = true;
+				 }
+				 else if (enemies[i].position.y > playerPos.y && enemies[i].position.x > playerPos.x)
+				 {
+					 enemies[i].position.y--;
+					 enemies[i].position.x--;
+					 enemies[i].hasMoved = true;
+				 }
+				 else if (enemies[i].position.y > playerPos.y && enemies[i].position.x < playerPos.x)
+				 {
+					 --enemies[i].position.y;
+					 ++enemies[i].position.x;
+					 enemies[i].hasMoved = true;
+				 }
+				 else if (enemies[i].position.y < playerPos.y && enemies[i].position.x > playerPos.x)
+				 {
+					 ++enemies[i].position.y;
+					 --enemies[i].position.x;
+					 enemies[i].hasMoved = true;
+				 }
+			 }
+		} 
 	}
 
 
@@ -518,10 +577,18 @@ void checkPlayerCollison() {
 
 			//player.character = 'K';
 			//enemies[i].character = 'O';
-
 			
-			setPosition(player.pointer, player.positionPrevious);
-			setPosition(enemies[i].pointer, enemies[i].positionPrevious);
+			if (enemies[i].hasMoved) 
+			{
+				setPosition(enemies[i].pointer, enemies[i].positionPrevious);
+			}
+
+			if (player.hasMoved)
+			{
+				setPosition(player.pointer, player.positionPrevious);
+			}
+			
+			break;
 		}
 	}
 
@@ -532,6 +599,11 @@ void damagePlayer(int damage)
 {
 	player.health -= damage;
 	printPlayerHealth();
+
+	if (player.health < 0) 
+	{
+		isRunning = false;
+	}
 }
 
 void UIrenderCharA(char a[], int length, Vector2D pos) 
@@ -559,4 +631,34 @@ void printPlayerHealth()
 	}
 
 	UIrenderCharA(healthA, PLAYERHEALTHLENGTH, playerHealthUIStart);
+}
+
+bool areAllEnemiesDead();
+void damageEnemy(int damage) 
+{
+	(*currentEnemy).health -= damage;
+
+	if ((*currentEnemy).health <= 0)
+	{
+		(*currentEnemy).isAlive = false;
+		//Remove enemy body here
+
+		messageBox.Add(Message("Enemy Dead!", 12));
+
+		if (areAllEnemiesDead) 
+		{
+			gameState = OVERWORLD;
+			messageBox.Add(Message("All enemies defeated.", 22));
+		}
+	}
+}
+bool areAllEnemiesDead() 
+{
+	for (Enemy element : enemies) 
+	{
+		if (element.isAlive) 
+		{
+			return false;
+		}
+	}
 }

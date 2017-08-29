@@ -14,6 +14,7 @@ struct Player
 	int attack = 10;
 
 	bool hasMoved = false;
+	bool isAlive = true;
 
 	Player *pointer;
 };

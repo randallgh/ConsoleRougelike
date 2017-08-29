@@ -7,8 +7,11 @@ struct Enemy
 	int health;
 	int attack;
 	char character;
+	char name[10];
+	bool isAlive;
 
 	bool hasMoved;
+	bool isTargetPlayer;
 
 	WORD characterColor;
 
