@@ -9,7 +9,7 @@ struct Player
 	Vector2D position = { 0,0 };
 	Vector2D positionPrevious = { 0,0 };
 
-	int health;
+	int health = 100;
 	int maxHealth = 100;
 	int attack = 10;
 

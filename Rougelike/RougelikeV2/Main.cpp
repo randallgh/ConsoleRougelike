@@ -56,6 +56,8 @@ char ground = 249;
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
 
+Vector2D playerHealthUIStart = { 59, 8 };
+
 /*-----Player-----*/
 Player player;
 
@@ -65,10 +67,13 @@ Player player;
 Enemy enemies[ENEMIESLENGTH];
 Enemy slime = {20, 5, 'S'};
 
+/*----Battle----*/
+Enemy currentEnemy;
+
 /*---------------------------------------------------------------------*/
 
 void render();
-void overworldInput();
+bool input();
 void checkPlayerCollison();
 void ai();
 
@@ -101,6 +106,10 @@ int main()
 		uiData[i] = ' ';
 	}
 
+	char healthUI[] = "Player: ";
+	//8 to the start
+	
+
 	//Need a line of characters at the top of the UI box
 	for (int y = 0; y < UIHEIGHT; ++y) {
 		for (int x = 0; x < WIDTH; ++x) {
@@ -116,9 +125,14 @@ int main()
 			if (x == 50 && y == 9) {
 				uiData[x + WIDTH * y] = 203;
 			}
-			if ((x >= 51 && y >= 8) && (x <= 61 && y <= 8)) {
-				uiData[x + WIDTH * y] = x + 48;
+			if (x == 51 && y == 8) {
+				for (int i = 0; i < 8; ++i) 
+				{
+					uiData[x + WIDTH * y + i] = healthUI[i];
+				}
 			}
+
+			
 		}
 	}
 
@@ -128,7 +142,7 @@ int main()
 	enemies[0].pointer = &enemies[0];
 
 	//Add player to pos
-	player.position = { 11, 11 };
+	player.position = { 0, 0 };
 	//mapData[player.position.x * player.position.y] = player.character;
 	player.pointer = &player;
 
@@ -144,13 +158,10 @@ int main()
 		{
 		case OVERWORLD:
 			//Playermovement
-			overworldInput();
+			input();
+			mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = ground;
 
 			//Move player
-			if (player.hasMoved) {
-				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = ground;
-			}
-
 
 			//Move enemies
 			ai();
@@ -162,6 +173,12 @@ int main()
 			break;
 
 		case BATTLE:
+
+			if (input()) {
+				mapData[vectorToFlatArray(player.positionPrevious, WIDTH)] = ground;
+				ai();
+				checkPlayerCollison();
+			}
 
 			break;
 		default:
@@ -205,7 +222,7 @@ void render()
 	WriteConsoleOutputA(wHnd, consoleBuffer, characterBufferSize, characterPosition, &consoleWriteArea);
 }
 
-void overworldInput() {
+bool input() {
 
 	//North East
 	if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_RIGHT))
@@ -224,7 +241,7 @@ void overworldInput() {
 			player.position.x = (WIDTH - 1);
 		}
 
-		player.hasMoved = true;
+		return true;
 
 	}
 	//South East
@@ -244,6 +261,8 @@ void overworldInput() {
 			player.position.x = (WIDTH - 1);
 		}
 
+		return true;
+
 	}
 	//South West
 	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_LEFT))
@@ -261,7 +280,7 @@ void overworldInput() {
 			player.position.x = 0;
 		}
 
-
+		return true;
 
 	}
 	//North West
@@ -278,8 +297,10 @@ void overworldInput() {
 		}
 
 		if (player.position.x < 0) {
-			player.position.x = 0;
+			player.position.x = 0;   
 		}
+
+		return true;
 
 	}
 	//North
@@ -295,7 +316,7 @@ void overworldInput() {
 			player.position.y = (MAPHEIGHT - 1);
 		}
 
-		player.hasMoved = true;
+		return true;
 	}
 	//South
 	else if (GetAsyncKeyState(VK_DOWN))
@@ -310,7 +331,7 @@ void overworldInput() {
 			player.position.y = 0;
 		}
 
-		player.hasMoved = true;
+		return true;
 	}
 	//East
 	else if (GetAsyncKeyState(VK_RIGHT))
@@ -325,7 +346,7 @@ void overworldInput() {
 			player.position.x = (WIDTH - 1);
 		}
 
-		player.hasMoved = true;
+		return true;
 	}
 	//West
 	else if (GetAsyncKeyState(VK_LEFT))
@@ -340,12 +361,22 @@ void overworldInput() {
 			player.position.x = 0;
 		}
 
-		player.hasMoved = true;
+		return true;
+
 	}
 
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		isRunning = false;
 	}
+
+	if (gameState == BATTLE) {
+		//Button to melee attack
+		if (GetAsyncKeyState(0x45)) {
+			//Attack current enemy
+		}
+	}
+
+
 }
 
 void ai() 
@@ -354,6 +385,7 @@ void ai()
 		setPreviousPosition(enemies[i].pointer, enemies[i].position);
 		mapData[vectorToFlatArray(enemies[i].positionPrevious, WIDTH)] = ground;
 	}
+
 	/*
 	Set the previous positon
 	Find where enemy wants to go
@@ -361,7 +393,10 @@ void ai()
 		-Are they close enough
 		-Choose the quickest route to the player
 	*/
-	if (distanceVector2D(enemies[0].position, player.position) > 2) {
+	float distance = distanceVector2D(enemies[0].position, player.position);
+
+	if ( distance > 1 && distance < 15) {
+		gameState = BATTLE;
 		if (enemies[0].position.x == player.position.x) {
 			if (enemies[0].position.y < player.position.y) {
 				enemies[0].position.y++;
@@ -372,13 +407,34 @@ void ai()
 			}
 		}
 		else if (enemies[0].position.y == player.position.y) {
-			if (enemies[0].position.x < player.position.x) {
+			if (enemies[0].position.x < player.position.x) 
+			{
 				enemies[0].position.x++;
 			}
 			else
 			{
 				enemies[0].position.x--;
 			}
+		} 
+		else if(enemies[0].position.y < player.position.y && enemies[0].position.x < player.position.x)
+		{
+			enemies[0].position.y++;
+			enemies[0].position.x++;
+		} 
+		else if(enemies[0].position.y > player.position.y && enemies[0].position.x > player.position.x)
+		{
+			enemies[0].position.y--;
+			enemies[0].position.x--;
+		}
+		else if (enemies[0].position.y > player.position.y && enemies[0].position.x < player.position.x) 
+		{
+			--enemies[0].position.y;
+			++enemies[0].position.x;
+		}
+		else if (enemies[0].position.y < player.position.y && enemies[0].position.x > player.position.x) 
+		{
+			++enemies[0].position.y;
+			--enemies[0].position.x;
 		}
 	}
 }
@@ -391,13 +447,22 @@ void checkPlayerCollison() {
 		if ((player.position.x == enemies[i].position.x) 
 			&& (player.position.y == enemies[i].position.y)) {
 
-			player.character = 'K';
-			enemies[i].character = 'O';
+			//player.character = 'K';
+			//enemies[i].character = 'O';
 
+			
 			setPosition(player.pointer, player.positionPrevious);
 			setPosition(enemies[i].pointer, enemies[i].positionPrevious);
 		}
 	}
 
 	//Wall Collsion
+}
+
+void printPlayerHealth() 
+{
+	for (int i = 0; i < 10; ++i)
+	{
+		//uiData[playerHealthUIStart.x * WIDTH * playerHealthUIStart.y + i] = ;
+	}
 }
