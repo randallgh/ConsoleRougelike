@@ -1,6 +1,6 @@
 #pragma once
-#include "Message.h"
-#include "Vector2D.h"
+#include "Message.h"::Message
+#include "Vector2D.h"::Vector2D
 
 class MessageBoxUI
 {

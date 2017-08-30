@@ -10,9 +10,13 @@
 
 
 #include "Player.h"
+
 #include "Enemy.h"
+
 #include "Message.h"
 #include "MessageBoxUI.h"
+
+#include "InfoBox.h"
 
 /*---------------------------------------------------------------------*/
 //RENDERING
@@ -73,6 +77,8 @@ char healthA[PLAYERHEALTHLENGTH] = {};
 
 MessageBoxUI messageBox({0,0});
 
+InfoBox infoBox({ 51,0 });
+
 //  PrintMessage("Player moved right")
 //std::string wMes = "Welcome";
 
@@ -84,7 +90,7 @@ MessageBoxUI messageBox({0,0});
 Player player;
 
 /*-----Enemies-----*/
-#define ENEMIESLENGTH 1
+#define ENEMIESLENGTH 2
 
 Enemy enemies[ENEMIESLENGTH];
 Enemy slime = {20, 5, 'S', "slime", true};
@@ -102,10 +108,19 @@ void ai();
 //Player UI
 void printPlayerHealth();
 void damagePlayer(int damage);
+void healPlayer(int health);
+void printPotions();
+void printLevel();
+
+
 void damageEnemy(int damage);
 
 //UI
 void UIrenderCharA(char a[], int length, Vector2D pos);
+void printUI();
+
+//Map
+void defaultMapToFile();
 
 
 int main()
@@ -130,50 +145,22 @@ int main()
 		mapData[i] = ground;
 	}
 
-
 	//UI Generation
 	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
 	{
 		uiData[i] = ' ';
 	}
 
-	char healthUI[] = "Player: ";
-	//8 to the start
-
-	//Need a line of characters at the top of the UI box
-	for (int y = 0; y < UIHEIGHT; ++y) {
-		for (int x = 0; x < WIDTH; ++x) {
-			if (y == 9) {
-				uiData[x + WIDTH * y] = 205;
-			}
-			if ((x >= 0 && y >= 8) && (x <= 9 && y <= 8)) {
-				uiData[x + WIDTH * y] = x + 48;
-			}
-			if (x == 50) {
-				uiData[x + WIDTH * y] = 186;
-			}
-			if (x == 50 && y == 9) {
-				uiData[x + WIDTH * y] = 203;
-			}
-			if (x == 51 && y == 8) {
-				for (int i = 0; i < 8; ++i) 
-				{
-					uiData[x + WIDTH * y + i] = healthUI[i];
-				}
-			}
-
-			
-		}
-	}
+	printUI();
 
 	//Add enemies to map
 	enemies[0] = copyEnemy(slime);
 	enemies[0].position = { 10, 20 };
 	enemies[0].pointer = &enemies[0];
 
-	/*enemies[1] = copyEnemy(slime);
+	enemies[1] = copyEnemy(slime);
 	enemies[1].position = { 20,20 };
-	enemies[1].pointer = &enemies[1];*/
+	enemies[1].pointer = &enemies[1];
 
 	//Add player to pos
 	player.position = { 0, 0 };
@@ -182,25 +169,17 @@ int main()
 
 	//First player health element
 	printPlayerHealth();
+	printPotions();
+	printLevel();
 
 	//Print welcome message
 	Message welcome("Welcome!", 9);
 	Message test("I'm a bannana!", 15);
 
 	messageBox.messages[0] = welcome;
-	//messageBox.messages[1] = welcome;
-	//messageBox.messages[2] = welcome;
 
 	messageBox.Clear(uiData, WIDTH, 50);
-	//messageBox.Add(welcome);
-	//messageBox.Add(welcome);
 	messageBox.Add(test);
-	//messageBox.Print(uiData, WIDTH, 50);
-
-	//UIrenderCharA(welcome.data, welcome.length, { 0,0 });
-	//UIrenderCharA(welcome.data, welcome.length, { 0,1 });
-	//UIrenderCharA(welcome.data, welcome.length, { 0,2 });
-	//UIrenderCharA(welcome.data, welcome.length, { 0,3 });
 
 
 	for (Enemy element : enemies) {
@@ -209,30 +188,7 @@ int main()
 
 	mapData[player.position.x + WIDTH * player.position.y] = player.character;
 
-
-	/*--------------------------Output default map---------------------------*/
-	std::string outputMapS;
-	std::ofstream outputMap;
-	char outputMapCharA[WIDTH * MAPHEIGHT] = {' '};
-
-	outputMap.open("defaultMap.txt");
-
-	//Get a string of data
-	for (int y = 0; y < MAPHEIGHT; ++y) {
-		for (int x = 0; x < WIDTH; ++x) {
-			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
-		}
-		outputMap << outputMapCharA << "\n";
-	}
-
-	outputMap.close();
-
-	//Add it to the file
-
-
-	/*-------------------------------------------------------------------------*/
-
-
+	defaultMapToFile();
 
 
 	/*---------------------------Game Loop--------------------------*/
@@ -472,21 +428,51 @@ bool input() {
 
 	player.hasMoved = false;
 
+
+	//Button to press to recover health: R key
+	//Calls a function to heal
+	//Removes a potion from the player
+	if (GetAsyncKeyState(0x52)) {
+
+		if (player.health < player.maxHealth) 
+		{
+			if (player.data.potions > 0)
+			{
+				messageBox.Add(Message("Healed self.", 13));
+				//Heal player
+				healPlayer(player.data.potionPower);
+				--player.data.potions;
+				printPotions();
+				return true;
+			}
+			else
+			{
+				messageBox.Add(Message("You do not have anymore potions.", 33));
+			}
+		} 
+		else
+		{
+			messageBox.Add(Message("You cannot heal at max health.", 31));
+		}
+		
+	}
+
+
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		isRunning = false;
 	}
 
-	if (GetAsyncKeyState(VK_OEM_PERIOD)) {
-		damagePlayer(10);
-		messageBox.Clear(uiData, WIDTH, 50);
-	}
+	//if (GetAsyncKeyState(VK_OEM_PERIOD)) {
+	//	damagePlayer(10);
+	//	messageBox.Clear(uiData, WIDTH, 50);
+	//}
 
 
 	if (gameState == BATTLE) {
 		//Find the closest enemy
 		for (Enemy element : enemies) 
 		{
-			if (element.isTargetPlayer) 
+			if (element.isTargetPlayer && element.isAlive) 
 			{
 				currentEnemy = element.pointer;
 			}
@@ -533,7 +519,7 @@ void ai()
 		Vector2D playerPos = player.positionPrevious;
 		 distance = distanceVector2D(enemies[i].position, playerPos);
 		 
-		 if (enemies[0].isAlive) 
+		 if (enemies[i].isAlive) 
 		 {
 			 if (distance <= 2)
 			 {
@@ -641,6 +627,16 @@ void damagePlayer(int damage)
 		isRunning = false;
 	}
 }
+void healPlayer(int health) 
+{
+	player.health += health;
+	if (player.health > player.maxHealth) 
+	{
+		player.health = player.maxHealth;
+	}
+	printPotions();
+	printPlayerHealth();
+}
 
 void UIrenderCharA(char a[], int length, Vector2D pos) 
 {
@@ -653,22 +649,23 @@ void UIrenderCharA(char a[], int length, Vector2D pos)
 //Call this only when the player takes damage
 void printPlayerHealth() 
 {
-	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i) {
-		healthA[i] = ' ';
-	}
-	
-	std::string health = std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
-
-	health.resize(PLAYERHEALTHLENGTH);
-
-	for (int i = 0; i < PLAYERHEALTHLENGTH; ++i)
-	{
-		healthA[i] = health.at(i);
-	}
-
-	UIrenderCharA(healthA, PLAYERHEALTHLENGTH, playerHealthUIStart);
+	std::string health = "Player: " + std::to_string(player.health) + "/" + std::to_string(player.maxHealth);
+	infoBox.AddInfo(uiData, WIDTH, 8, health);
 }
 
+void printPotions() 
+{
+	std::string potion = "Potions: " + std::to_string(player.data.potions) + "/" + std::to_string(player.data.maxPotions);
+	infoBox.AddInfo(uiData, WIDTH, 7, potion);
+}
+
+void printLevel()
+{
+	std::string level = "Level: " + std::to_string(player.level);
+	infoBox.AddInfo(uiData, WIDTH, 0, level);
+}
+
+void EnemyDied();
 bool areAllEnemiesDead();
 void damageEnemy(int damage) 
 {
@@ -679,6 +676,7 @@ void damageEnemy(int damage)
 		(*currentEnemy).isAlive = false;
 		//Remove enemy body here
 
+		EnemyDied();
 		messageBox.Add(Message("Enemy Dead!", 12));
 
 		if (areAllEnemiesDead()) 
@@ -689,6 +687,24 @@ void damageEnemy(int damage)
 	}
 }
 
+void EnemyDied()
+{
+	//Add function for adding potions
+	//Add Item class
+	++player.data.potions;
+	player.data.exp += 10;
+	messageBox.Add(Message("The enemy was defeated!", 24));
+
+	if (player.data.exp >= 10) 
+	{
+		++player.level;
+		messageBox.Add(Message("Level up!", 10));
+		printLevel();
+	}
+
+	printPotions();
+}
+
 bool areAllEnemiesDead() 
 {
 	for (Enemy element : enemies) 
@@ -696,6 +712,61 @@ bool areAllEnemiesDead()
 		if (element.isAlive) 
 		{
 			return false;
+		}
+	}
+}
+
+void defaultMapToFile() 
+{
+	/*--------------------------Output default map---------------------------*/
+	std::string outputMapS;
+	std::ofstream outputMap;
+	char outputMapCharA[WIDTH * MAPHEIGHT] = { ' ' };
+
+	outputMap.open("defaultMap.txt");
+
+	//Get a string of data
+	for (int y = 0; y < MAPHEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
+			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+		}
+		outputMap << outputMapCharA << "\n";
+	}
+
+	outputMap.close();
+
+	//Add it to the file
+
+
+	/*-------------------------------------------------------------------------*/
+}
+
+void printUI() 
+{
+	char healthUI[] = "Player: ";
+	//Need a line of characters at the top of the UI box
+	for (int y = 0; y < UIHEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
+			if (y == 9) {
+				uiData[x + WIDTH * y] = 205;
+			}
+			if ((x >= 0 && y >= 8) && (x <= 9 && y <= 8)) {
+				uiData[x + WIDTH * y] = x + 48;
+			}
+			if (x == 50) {
+				uiData[x + WIDTH * y] = 186;
+			}
+			if (x == 50 && y == 9) {
+				uiData[x + WIDTH * y] = 203;
+			}
+			if (x == 51 && y == 8) {
+				for (int i = 0; i < 8; ++i)
+				{
+					uiData[x + WIDTH * y + i] = healthUI[i];
+				}
+			}
+
+
 		}
 	}
 }

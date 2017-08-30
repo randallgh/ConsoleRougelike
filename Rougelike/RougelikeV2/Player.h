@@ -1,6 +1,9 @@
 #pragma once
-#include "Vector2D.h"
 #include <Windows.h>::WORD
+
+#include "PlayerData.h"
+#include "Vector2D.h"
+
 
 struct Player
 {
@@ -13,9 +16,12 @@ struct Player
 	int maxHealth = 100;
 	int attack = 10;
 
+	int level = 1;
+
 	bool hasMoved = false;
 	bool isAlive = true;
 
+	PlayerData data;
 	Player *pointer;
 };
 
