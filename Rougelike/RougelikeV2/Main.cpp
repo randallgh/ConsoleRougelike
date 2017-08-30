@@ -173,8 +173,8 @@ int main()
 	printLevel();
 
 	//Print welcome message
-	Message welcome("Welcome!", 9);
-	Message test("I'm a bannana!", 15);
+	Message welcome("Welcome!");
+	Message test("I'm a bannana!");
 
 	messageBox.messages[0] = welcome;
 
@@ -438,7 +438,7 @@ bool input() {
 		{
 			if (player.data.potions > 0)
 			{
-				messageBox.Add(Message("Healed self.", 13));
+				messageBox.Add(Message("Healed self."));
 				//Heal player
 				healPlayer(player.data.potionPower);
 				--player.data.potions;
@@ -447,12 +447,12 @@ bool input() {
 			}
 			else
 			{
-				messageBox.Add(Message("You do not have anymore potions.", 33));
+				messageBox.Add(Message("You do not have anymore potions."));
 			}
 		} 
 		else
 		{
-			messageBox.Add(Message("You cannot heal at max health.", 31));
+			messageBox.Add(Message("You cannot heal at max health."));
 		}
 		
 	}
@@ -487,7 +487,7 @@ bool input() {
 				int distance = distanceVector2D(player.position, (*currentEnemy).position);
 				if (distance <= 2)
 				{
-					messageBox.Add(Message("Damage enemy.", 14));
+					messageBox.Add(Message("Damage enemy."));
 
 					damageEnemy(player.attack);
 				}
@@ -525,7 +525,7 @@ void ai()
 			 {
 				 //Damageplayer
 				 int damage = enemies[i].attack;
-				 Message attack("Enemy damaged player.", 22);
+				 Message attack("Enemy damaged player.");
 				 messageBox.Add(attack);
 				 damagePlayer(damage);
 			 }
@@ -677,12 +677,12 @@ void damageEnemy(int damage)
 		//Remove enemy body here
 
 		EnemyDied();
-		messageBox.Add(Message("Enemy Dead!", 12));
+		messageBox.Add(Message("Enemy Dead!"));
 
 		if (areAllEnemiesDead()) 
 		{
 			gameState = OVERWORLD;
-			messageBox.Add(Message("All enemies defeated.", 22));
+			messageBox.Add(Message("All enemies defeated."));
 		}
 	}
 }
@@ -693,12 +693,12 @@ void EnemyDied()
 	//Add Item class
 	++player.data.potions;
 	player.data.exp += 10;
-	messageBox.Add(Message("The enemy was defeated!", 24));
+	messageBox.Add(Message("The enemy was defeated!"));
 
 	if (player.data.exp >= 10) 
 	{
 		++player.level;
-		messageBox.Add(Message("Level up!", 10));
+		messageBox.Add(Message("Level up!"));
 		printLevel();
 	}
 
