@@ -6,6 +6,9 @@
 #include <iostream>
 #include <string>
 
+#include <fstream>
+
+
 #include "Player.h"
 #include "Enemy.h"
 #include "Message.h"
@@ -56,7 +59,7 @@ bool isRunning = true;
 /*-----Map-----*/
 char mapData[WIDTH * MAPHEIGHT];
 
-char ground = 249;
+char ground = '.';//249;
 
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
@@ -127,6 +130,7 @@ int main()
 		mapData[i] = ground;
 	}
 
+
 	//UI Generation
 	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
 	{
@@ -135,7 +139,6 @@ int main()
 
 	char healthUI[] = "Player: ";
 	//8 to the start
-	
 
 	//Need a line of characters at the top of the UI box
 	for (int y = 0; y < UIHEIGHT; ++y) {
@@ -198,6 +201,39 @@ int main()
 	//UIrenderCharA(welcome.data, welcome.length, { 0,1 });
 	//UIrenderCharA(welcome.data, welcome.length, { 0,2 });
 	//UIrenderCharA(welcome.data, welcome.length, { 0,3 });
+
+
+	for (Enemy element : enemies) {
+		mapData[element.position.x + WIDTH * element.position.y] = element.character;
+	}
+
+	mapData[player.position.x + WIDTH * player.position.y] = player.character;
+
+
+	/*--------------------------Output default map---------------------------*/
+	std::string outputMapS;
+	std::ofstream outputMap;
+	char outputMapCharA[WIDTH * MAPHEIGHT] = {' '};
+
+	outputMap.open("defaultMap.txt");
+
+	//Get a string of data
+	for (int y = 0; y < MAPHEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
+			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+		}
+		outputMap << outputMapCharA << "\n";
+	}
+
+	outputMap.close();
+
+	//Add it to the file
+
+
+	/*-------------------------------------------------------------------------*/
+
+
+
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -645,13 +681,14 @@ void damageEnemy(int damage)
 
 		messageBox.Add(Message("Enemy Dead!", 12));
 
-		if (areAllEnemiesDead) 
+		if (areAllEnemiesDead()) 
 		{
 			gameState = OVERWORLD;
 			messageBox.Add(Message("All enemies defeated.", 22));
 		}
 	}
 }
+
 bool areAllEnemiesDead() 
 {
 	for (Enemy element : enemies) 

@@ -1,25 +1,39 @@
 #include <iostream>
+#include <fstream>
+#include <chrono>
+
+#include <string>
 
 void intToCharArray(int num, char a[], int length);
 
-
 int main() 
 {
-	char x[20] = {};
-	int a = 100;
-	std::cout << a << std::endl;
+	//Out to PC
+	std::ofstream myfile;
+	myfile.open("test.txt");
+	myfile << "Hell" << " " << "\n";
+	myfile << "Hell" << __TIME__ << "\n";
+	myfile << "Hell" << __TIME__ << "\n";
+	myfile << "Hello text editor. " << __TIME__ << "\n";
+	myfile.close();
 
-	//memcpy(&a, x, sizeof(int));
-	intToCharArray(a, x, 20);
+	//Into code
+	std::ifstream afile;
+	std::string line;
+	afile.open("test.txt");
 
-
-	std::cout << a << std::endl << "X:";
-	
-	for (char element : x) {
-		std::cout << element;
+	if (afile.is_open()) 
+	{
+		while ( getline(afile,line) )
+		{
+			std::cout << line << " " << line.size() << std::endl;
+		}
+	}
+	else 
+	{
+		std::cout << "Unable to find file";
 	}
 
-	std::cout << std::endl;
 	system("PAUSE");
 	return 0;
 }

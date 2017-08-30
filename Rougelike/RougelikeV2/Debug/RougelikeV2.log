@@ -1,3 +1,14 @@
-﻿  Input.cpp
+﻿  Main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\player.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\enemy.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(147): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(153): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(156): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(241): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(297): warning C4101: 'tempChar': unreferenced local variable
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(501): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(514): warning C4715: 'input': not all control paths return a value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(701): warning C4715: 'areAllEnemiesDead': not all control paths return a value
+cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)
