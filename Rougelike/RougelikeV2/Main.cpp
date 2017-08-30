@@ -93,7 +93,7 @@ Player player;
 #define ENEMIESLENGTH 2
 
 Enemy enemies[ENEMIESLENGTH];
-Enemy slime = {20, 5, 'S', "slime", true};
+Enemy slime = {20, 5, 'S', "Slime", true};
 
 /*----Battle----*/
 Enemy *currentEnemy;
@@ -112,6 +112,8 @@ void healPlayer(int health);
 void printPotions();
 void printLevel();
 
+bool didProc(int prob);
+
 
 void damageEnemy(int damage);
 
@@ -125,6 +127,8 @@ void defaultMapToFile();
 
 int main()
 {
+	srand(time(0));
+
 	/* initialize handles */
 	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
 	rHnd = GetStdHandle(STD_INPUT_HANDLE);
@@ -138,7 +142,16 @@ int main()
 	/* Set the screen's buffer size */
 	SetConsoleScreenBufferSize(wHnd, bufferSize);
 
-	//Map Generation
+	/*---Turn off Cursor---*/
+	
+	CONSOLE_CURSOR_INFO cursorInfo;
+
+	GetConsoleCursorInfo(wHnd, &cursorInfo);
+	cursorInfo.bVisible = false;
+	cursorInfo.dwSize = 1;
+	SetConsoleCursorInfo(wHnd, &cursorInfo);
+
+	/*-----------Map Generation----------*/
 
 	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
 	{
@@ -193,8 +206,6 @@ int main()
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
-
-		srand(time(0));
 
 		switch (gameState)
 		{
@@ -401,7 +412,8 @@ bool input() {
 			player.position.x = (WIDTH - 1);
 		}
 		//Message move("Player moved east.", 19);
-		//messageBox.Add(move);
+		//messageBox.Add(move)
+
 		player.hasMoved = true;
 		return true;
 	}
@@ -525,7 +537,11 @@ void ai()
 			 {
 				 //Damageplayer
 				 int damage = enemies[i].attack;
-				 Message attack("Enemy damaged player.");
+
+				 std::string damageS = enemies[i].name;
+				 damageS.append(" did " + std::to_string(damage) + " damage to player");
+				 Message attack(damageS);
+
 				 messageBox.Add(attack);
 				 damagePlayer(damage);
 			 }
@@ -627,6 +643,7 @@ void damagePlayer(int damage)
 		isRunning = false;
 	}
 }
+
 void healPlayer(int health) 
 {
 	player.health += health;
@@ -769,4 +786,14 @@ void printUI()
 
 		}
 	}
+}
+
+bool didProc(int prob) 
+{
+	if ((rand() % 100 + 1) <= prob)
+	{
+		return true;
+	}
+
+	return false;
 }

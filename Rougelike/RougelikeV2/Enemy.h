@@ -9,6 +9,7 @@ struct Enemy
 	char character;
 	char name[10];
 	bool isAlive;
+	int exp;
 
 	bool hasMoved;
 	bool isTargetPlayer;
