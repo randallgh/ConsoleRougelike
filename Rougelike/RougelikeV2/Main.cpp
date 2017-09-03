@@ -87,7 +87,7 @@ InfoBox infoBox({ 51,0 });
 
 #define MESSAGELENGTH 50
 /*-----Player-----*/
-PlayerManager playerM;
+PlayerManager playerM(uiData, WIDTH, &infoBox);
 //Player player;
 
 /*-----Enemies-----*/
@@ -108,10 +108,10 @@ void ai();
 
 //Player UI
 //void printPlayerHealth();
-void damagePlayer(int damage);
-void healPlayer(int health);
-void printPotions();
-void printLevel();
+//void damagePlayer(int damage);
+//void healPlayer(int health);
+//void printPotions();
+//void printLevel();
 
 bool didProc(int prob);
 
@@ -181,10 +181,9 @@ int main()
 	//mapData[player.position.x * player.position.y] = player.character;
 
 	//First player health element
-	playerM.printHealth(uiData, WIDTH, &infoBox);
-	//printPlayerHealth();
-	printPotions();
-	printLevel();
+	playerM.printHealth();
+	playerM.printPotions();
+	playerM.printLevel();
 
 	//Print welcome message
 	Message welcome("Welcome!");
@@ -285,22 +284,24 @@ void render()
 
 bool input() {
 
+	Vector2D *playerPos = &playerM.player.position;
+
 	//North East
 	if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_RIGHT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
-		//setPreviousPosition(playerM.player.pointer, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
+		//setPreviousPosition(playerM.player.pointer, (*playerPos));
 		
-		++playerM.player.position.y;
-		++playerM.player.position.x;
+		++(*playerPos).y;
+		++(*playerPos).x;
 
-		if (playerM.player.position.y >= MAPHEIGHT) {
-			playerM.player.position.y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAPHEIGHT) {
+			(*playerPos).y = (MAPHEIGHT - 1);
 
 		}
 
-		if (playerM.player.position.x >= WIDTH) {
-			playerM.player.position.x = (WIDTH - 1);
+		if ((*playerPos).x >= WIDTH) {
+			(*playerPos).x = (WIDTH - 1);
 		}
 		playerM.player.hasMoved = true;
 		return true;
@@ -309,18 +310,18 @@ bool input() {
 	//South East
 	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_RIGHT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 
-		--playerM.player.position.y;
-		++playerM.player.position.x;
+		--(*playerPos).y;
+		++(*playerPos).x;
 		
 
-		if (playerM.player.position.y <= 0) {
-			playerM.player.position.y = 0;
+		if ((*playerPos).y <= 0) {
+			(*playerPos).y = 0;
 		}
 
-		if (playerM.player.position.x >= WIDTH) {
-			playerM.player.position.x = (WIDTH - 1);
+		if ((*playerPos).x >= WIDTH) {
+			(*playerPos).x = (WIDTH - 1);
 		}
 		playerM.player.hasMoved = true;
 		return true;
@@ -329,17 +330,17 @@ bool input() {
 	//South West
 	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_LEFT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 
-		--playerM.player.position.y;
-		--playerM.player.position.x;
+		--(*playerPos).y;
+		--(*playerPos).x;
 
-		if (playerM.player.position.y <= 0) {
-			playerM.player.position.y = 0;
+		if ((*playerPos).y <= 0) {
+			(*playerPos).y = 0;
 		}
 
-		if (playerM.player.position.x < 0) {
-			playerM.player.position.x = 0;
+		if ((*playerPos).x < 0) {
+			(*playerPos).x = 0;
 		}
 		playerM.player.hasMoved = true;
 		return true;
@@ -348,18 +349,18 @@ bool input() {
 	//North West
 	else if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_LEFT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 
-		++playerM.player.position.y;
-		--playerM.player.position.x;
+		++(*playerPos).y;
+		--(*playerPos).x;
 
-		if (playerM.player.position.y >= MAPHEIGHT) {
-			playerM.player.position.y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAPHEIGHT) {
+			(*playerPos).y = (MAPHEIGHT - 1);
 
 		}
 
-		if (playerM.player.position.x < 0) {
-			playerM.player.position.x = 0;   
+		if ((*playerPos).x < 0) {
+			(*playerPos).x = 0;   
 		}
 		playerM.player.hasMoved = true;
 		return true;
@@ -369,14 +370,14 @@ bool input() {
 	else if (GetAsyncKeyState(VK_UP))
 	{
 		
-		/*previousChar = mapData[playerM.player.position.x + WIDTH * playerM.player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		/*previousChar = mapData[(*playerPos).x + WIDTH * (*playerPos).y];*/
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 		//previousPos = (player.position.x + WIDTH * player.position.y);
 
-		playerM.player.position.y++;
+		(*playerPos).y++;
 
-		if (playerM.player.position.y >= MAPHEIGHT) {
-			playerM.player.position.y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAPHEIGHT) {
+			(*playerPos).y = (MAPHEIGHT - 1);
 		}
 		//Message move("playerM.player moved north.", 20);
 		//messageBox.Add(move);
@@ -387,14 +388,14 @@ bool input() {
 	else if (GetAsyncKeyState(VK_DOWN))
 	{
 		
-		/*previousChar = mapData[playerM.player.position.x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		/*previousChar = mapData[(*playerPos).x + WIDTH * player.position.y];*/
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 		//previousPos = (player.position.x + WIDTH * player.position.y);
 
-		playerM.player.position.y--;
+		(*playerPos).y--;
 
-		if (playerM.player.position.y <= 0) {
-			playerM.player.position.y = 0;
+		if ((*playerPos).y <= 0) {
+			(*playerPos).y = 0;
 		}
 		//Message move("Player moved south.", 20);
 		//messageBox.Add(move);
@@ -405,13 +406,13 @@ bool input() {
 	else if (GetAsyncKeyState(VK_RIGHT))
 	{
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 		//previousPos = (player.position.x + WIDTH * player.position.y);
 
-		playerM.player.position.x++;
+		(*playerPos).x++;
 
-		if (playerM.player.position.x >= WIDTH) {
-			playerM.player.position.x = (WIDTH - 1);
+		if ((*playerPos).x >= WIDTH) {
+			(*playerPos).x = (WIDTH - 1);
 		}
 		//Message move("Player moved east.", 19);
 		//messageBox.Add(move)
@@ -424,13 +425,13 @@ bool input() {
 	{
 		
 		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, playerM.player.position);
+		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
 		//previousPos = (player.position.x + WIDTH * player.position.y);
 
-		playerM.player.position.x--;
+		(*playerPos).x--;
 
-		if (playerM.player.position.x < 0) {
-			playerM.player.position.x = 0;
+		if ((*playerPos).x < 0) {
+			(*playerPos).x = 0;
 		}
 		
 		//Message move("Player moved west.", 19);
@@ -454,9 +455,9 @@ bool input() {
 			{
 				messageBox.Add(Message("Healed self."));
 				//Heal player
-				healPlayer(playerM.data.potionPower);
+				playerM.heal(playerM.data.potionPower);
 				--playerM.data.potions;
-				printPotions();
+				playerM.printPotions();
 				return true;
 			}
 			else
@@ -498,7 +499,7 @@ bool input() {
 			//Attack current enemy
 			if ((*currentEnemy).isAlive)
 			{
-				int distance = distanceVector2D(playerM.player.position, (*currentEnemy).position);
+				int distance = distanceVector2D((*playerPos), (*currentEnemy).position);
 				if (distance <= 2)
 				{
 					messageBox.Add(Message("Damage enemy."));
@@ -545,7 +546,9 @@ void ai()
 				 Message attack(damageS);
 
 				 messageBox.Add(attack);
-				 damagePlayer(damage);
+
+				 playerM.damage(damage);
+				 playerM.printHealth();
 			 }
 			 else if (distance >= 2 && distance < 15) {
 				 gameState = BATTLE;
@@ -635,46 +638,12 @@ void checkPlayerCollison() {
 	//Wall Collsion
 }
 
-void damagePlayer(int damage) 
-{
-	playerM.player.health -= damage;
-	playerM.printHealth(uiData, WIDTH, &infoBox);
-
-	if (playerM.player.health < 0) 
-	{
-		isRunning = false;
-	}
-}
-
-void healPlayer(int health) 
-{
-	playerM.player.health += health;
-	if (playerM.player.health > playerM.player.maxHealth) 
-	{
-		playerM.player.health = playerM.player.maxHealth;
-	}
-	printPotions();
-	playerM.printHealth(uiData, WIDTH, &infoBox);
-}
-
 void UIrenderCharA(char a[], int length, Vector2D pos) 
 {
 	for (int i = 0; i < length; ++i)
 	{
 		uiData[pos.x + WIDTH * pos.y + i] = a[i];
 	}
-}
-
-void printPotions() 
-{
-	std::string potion = "Potions: " + std::to_string(playerM.data.potions) + "/" + std::to_string(playerM.data.maxPotions);
-	infoBox.AddInfo(uiData, WIDTH, 7, potion);
-}
-
-void printLevel()
-{
-	std::string level = "Level: " + std::to_string(playerM.player.level);
-	infoBox.AddInfo(uiData, WIDTH, 0, level);
 }
 
 void EnemyDied();
@@ -711,10 +680,10 @@ void EnemyDied()
 	{
 		++playerM.player.level;
 		messageBox.Add(Message("Level up!"));
-		printLevel();
+		playerM.printLevel();
 	}
 
-	printPotions();
+	playerM.printPotions();
 }
 
 bool areAllEnemiesDead() 
