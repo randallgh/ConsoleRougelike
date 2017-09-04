@@ -18,8 +18,22 @@ EnemyManager::EnemyManager(char map[], int width)
 	}
 }
 
+bool EnemyManager::areAllDead()
+{
+	for (int i = 0; i < getMaxEnemies(); ++i)
+	{
+		if (enemies[i].isAlive)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 EnemyManager::~EnemyManager()
 {
+
 }
 
 int EnemyManager::getMaxEnemies()

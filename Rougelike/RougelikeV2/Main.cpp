@@ -19,34 +19,8 @@
 
 #include "InfoBox.h"
 
-/*---------------------------------------------------------------------*/
-//RENDERING
-#define WIDTH 80 //70
-#define HEIGHT 50 //35
+#include "Window.h"
 
-#define MAPHEIGHT 40 //Uses the same width as the screen
-#define UIHEIGHT 10 //Uses the same width as the screen
-
-
-
-HANDLE wHnd; /* write (output) handle */
-HANDLE rHnd; /* read (input handle */
-
-/* Window size coordinates, be sure to start index at zero! */
-SMALL_RECT windowSize = { 0, 0, WIDTH - 1, HEIGHT - 1 };
-
-/* A COORD struct for specificying the console's screen buffer dimensions */
-COORD bufferSize = { WIDTH, HEIGHT };
-
-/* Setting up different variables for passing to WriteConsoleOutput */
-COORD characterBufferSize = { WIDTH, HEIGHT };
-COORD characterPosition = { 0, 0 };
-SMALL_RECT consoleWriteArea = { 0, 0, WIDTH - 1, HEIGHT - 1 };
-
-/* A CHAR_INFO structure containing data about a single character */
-CHAR_INFO consoleBuffer[WIDTH * HEIGHT];
-
-/*---------------------------------------------------------------------*/
 //States
 
 enum GameStates
@@ -106,7 +80,7 @@ NPC *currentEnemy;
 
 void render();
 bool input();
-void checkPlayerCollison();
+//void checkPlayerCollison();
 void ai();
 
 //Random
@@ -122,7 +96,6 @@ void printUI();
 void defaultMapToFile();
 
 void EnemyDied();
-bool areAllEnemiesDead();
 
 
 int main()
@@ -165,7 +138,7 @@ int main()
 	}
 
 	printUI();
-	//
+
 	//Add enemies to map
 	NPC slime('S',15,"Slime",20,5,1);
 
@@ -176,7 +149,6 @@ int main()
 	playerM.player.position = { 0, 0 };
 	//mapData[player.position.x * player.position.y] = player.character;
 
-	//First player health element
 	playerM.printHealth();
 	playerM.printPotions();
 	playerM.printLevel();
@@ -211,7 +183,6 @@ int main()
 
 			//Check for collison
 			//If the positons of both the enemy and player are the same COLLIDE and start battle
-			checkPlayerCollison();
 
 			break;
 
@@ -220,7 +191,6 @@ int main()
 			if (input()) {
 				mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
 				ai();
-				checkPlayerCollison();
 			}
 
 			break;
@@ -239,8 +209,6 @@ int main()
 		Sleep(100);
 	}
 }
-
-
 
 //Takes whatever is in mapData and adds it to the console buffer
 void render()
@@ -475,10 +443,23 @@ bool input() {
 
 		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
 		{
-			NPC element = enemyManager.enemies[i];
-			if (element.isTargetingPlayer && element.isAlive)
+			if (currentEnemy == nullptr) 
 			{
 				currentEnemy = &enemyManager.enemies[i];
+			}
+
+			NPC * element = &enemyManager.enemies[i];
+			if (element->isTargetingPlayer && element->isAlive)
+			{
+				if (distanceVector2D(element->position, playerM.player.position)
+					< distanceVector2D(currentEnemy->position, playerM.player.position)){
+					currentEnemy = element;
+				}
+
+				if (!currentEnemy->isAlive)
+				{
+					currentEnemy = element;
+				}
 			}
 		}
 
@@ -492,7 +473,6 @@ bool input() {
 				if (distance <= 2)
 				{
 					messageBox.Add(Message("Damage enemy."));
-
 					damageEnemy(playerM.player.attack);
 				}
 			}
@@ -602,34 +582,34 @@ void ai()
 
 }
 
-void checkPlayerCollison() {
-	//If the player and any enemy have the same positon
-
-	//Enemy Collison
-	for (int i = 0; i < ENEMIESLENGTH; ++i) {
-
-		if ((playerM.player.position.x == enemyManager.enemies[i].position.x)
-			&& (playerM.player.position.y == enemyManager.enemies[i].position.y)) {
-
-			//player.character = 'K';
-			//enemies[i].character = 'O';
-			
-			if (enemyManager.enemies[i].hasMoved)
-			{
-				enemyManager.enemies[i].position = enemyManager.enemies[i].positionPrevious;
-			}
-
-			if (playerM.player.hasMoved)
-			{
-				playerM.player.setPreviousPosition(&playerM.player, playerM.player.positionPrevious);
-			}
-			
-			break;
-		}
-	}
-
-	//Wall Collsion
-}
+//void checkPlayerCollison() {
+//	//If the player and any enemy have the same positon
+//
+//	//Enemy Collison
+//	for (int i = 0; i < ENEMIESLENGTH; ++i) {
+//
+//		if ((playerM.player.position.x == enemyManager.enemies[i].position.x)
+//			&& (playerM.player.position.y == enemyManager.enemies[i].position.y)) {
+//
+//			//player.character = 'K';
+//			//enemies[i].character = 'O';
+//			
+//			if (enemyManager.enemies[i].hasMoved)
+//			{
+//				enemyManager.enemies[i].position = enemyManager.enemies[i].positionPrevious;
+//			}
+//
+//			if (playerM.player.hasMoved)
+//			{
+//				playerM.player.setPreviousPosition(&playerM.player, playerM.player.positionPrevious);
+//			}
+//			
+//			break;
+//		}
+//	}
+//
+//	//Wall Collsion
+//}
 
 void UIrenderCharA(char a[], int length, Vector2D pos) 
 {
@@ -654,7 +634,7 @@ void damageEnemy(int damage)
 		EnemyDied();
 		messageBox.Add(Message("Enemy Dead!"));
 
-		if (areAllEnemiesDead()) 
+		if (enemyManager.areAllDead()) 
 		{
 			gameState = OVERWORLD;
 			messageBox.Add(Message("All enemies defeated."));
@@ -678,18 +658,6 @@ void EnemyDied()
 	}
 
 	playerM.printPotions();
-}
-
-bool areAllEnemiesDead() 
-{
-
-	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
-	{
-		if (enemyManager.enemies[i].isAlive)
-		{
-			return false;
-		}
-	}
 }
 
 void defaultMapToFile() 

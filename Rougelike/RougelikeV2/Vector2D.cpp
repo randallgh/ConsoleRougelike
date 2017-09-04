@@ -4,8 +4,7 @@
 
 float distanceVector2D(Vector2D a, Vector2D b) {
 	float dis = sqrt(pow( (float)b.x - a.x, 2) + pow( (float)b.y - a.y, 2));
-	dis = ceil(dis);
-	return (int)dis;
+	return dis;
 }
 
 int vectorToFlatArray(Vector2D vec, int width) {
