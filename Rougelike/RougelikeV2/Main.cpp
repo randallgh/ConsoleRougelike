@@ -10,8 +10,9 @@
 
 
 #include "PlayerManager.h"
+#include "EnemyManager.h"
 //#include "Player.h"
-#include "Enemy.h"
+//#include "Enemy.h"
 
 #include "Message.h"
 #include "MessageBoxUI.h"
@@ -91,13 +92,15 @@ PlayerManager playerM(uiData, WIDTH, &infoBox);
 //Player player;
 
 /*-----Enemies-----*/
+EnemyManager enemyManager(mapData,WIDTH);
+
 #define ENEMIESLENGTH 2
 
-Enemy enemies[ENEMIESLENGTH];
-Enemy slime = {20, 5, 'S', "Slime", true};
+//Enemy enemies[ENEMIESLENGTH];
+//Enemy slime = {20, 5, 'S', "Slime", true};
 
 /*----Battle----*/
-Enemy *currentEnemy;
+NPC *currentEnemy;
 
 /*---------------------------------------------------------------------*/
 
@@ -106,15 +109,8 @@ bool input();
 void checkPlayerCollison();
 void ai();
 
-//Player UI
-//void printPlayerHealth();
-//void damagePlayer(int damage);
-//void healPlayer(int health);
-//void printPotions();
-//void printLevel();
-
+//Random
 bool didProc(int prob);
-
 
 void damageEnemy(int damage);
 
@@ -124,6 +120,9 @@ void printUI();
 
 //Map
 void defaultMapToFile();
+
+void EnemyDied();
+bool areAllEnemiesDead();
 
 
 int main()
@@ -166,15 +165,12 @@ int main()
 	}
 
 	printUI();
-
+	//
 	//Add enemies to map
-	enemies[0] = copyEnemy(slime);
-	enemies[0].position = { 10, 20 };
-	enemies[0].pointer = &enemies[0];
+	NPC slime('S',15,"Slime",20,5,1);
 
-	enemies[1] = copyEnemy(slime);
-	enemies[1].position = { 20,20 };
-	enemies[1].pointer = &enemies[1];
+	enemyManager.addEnemy(slime, { 10, 20 });
+	enemyManager.addEnemy(slime, { 20, 20 });
 
 	//Add player to pos
 	playerM.player.position = { 0, 0 };
@@ -185,23 +181,16 @@ int main()
 	playerM.printPotions();
 	playerM.printLevel();
 
-	//Print welcome message
-	Message welcome("Welcome!");
-	Message test("I'm a bannana!");
+	enemyManager.printEnemies();
 
-	messageBox.messages[0] = welcome;
-
-	messageBox.Clear(uiData, WIDTH, 50);
-	messageBox.Add(test);
-
-
-	for (Enemy element : enemies) {
+	for (NPC element : enemyManager.enemies) {
 		mapData[element.position.x + WIDTH * element.position.y] = element.character;
 	}
 
+	//TODO add to player manager
 	mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
 
-	defaultMapToFile();
+	//defaultMapToFile();
 
 
 	/*---------------------------Game Loop--------------------------*/
@@ -241,9 +230,7 @@ int main()
 
 
 		//Render
-		for (Enemy element : enemies) {
-			mapData[element.position.x + WIDTH * element.position.y] = element.character;
-		}
+		enemyManager.printEnemies();
 
 		mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
 
@@ -485,11 +472,13 @@ bool input() {
 
 	if (gameState == BATTLE) {
 		//Find the closest enemy
-		for (Enemy element : enemies) 
+
+		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
 		{
-			if (element.isTargetPlayer && element.isAlive) 
+			NPC element = enemyManager.enemies[i];
+			if (element.isTargetingPlayer && element.isAlive)
 			{
-				currentEnemy = element.pointer;
+				currentEnemy = &enemyManager.enemies[i];
 			}
 		}
 
@@ -517,8 +506,10 @@ bool input() {
 void ai() 
 {
 	for (int i = 0; i < ENEMIESLENGTH; ++i) {
-		setPreviousPosition(enemies[i].pointer, enemies[i].position);
-		mapData[vectorToFlatArray(enemies[i].positionPrevious, WIDTH)] = ground;
+
+		enemyManager.enemies[i].setPreviousPosition(&enemyManager.enemies[i], enemyManager.enemies[i].position);
+		//setPreviousPosition(enemies[i].pointer, enemies[i].position);
+		mapData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIDTH)] = ground;
 	}
 
 	/*
@@ -532,17 +523,18 @@ void ai()
 	for (int i = 0; i < ENEMIESLENGTH; ++i)
 	{
 		Vector2D playerPos = playerM.player.positionPrevious;
-		 distance = distanceVector2D(enemies[i].position, playerPos);
+		 distance = distanceVector2D(enemyManager.enemies[i].position, playerPos);
 		 
-		 if (enemies[i].isAlive) 
+		 if (enemyManager.enemies[i].isAlive)
 		 {
 			 if (distance <= 2)
 			 {
 				 //Damageplayer
-				 int damage = enemies[i].attack;
+				 int damage = enemyManager.enemies[i].attack;
 
-				 std::string damageS = enemies[i].name;
-				 damageS.append(" did " + std::to_string(damage) + " damage to player");
+				 std::string damageS = enemyManager.enemies[i].name + " did " 
+									+ std::to_string(damage) + " damage to player";
+				 //damageS.append();
 				 Message attack(damageS);
 
 				 messageBox.Add(attack);
@@ -552,54 +544,54 @@ void ai()
 			 }
 			 else if (distance >= 2 && distance < 15) {
 				 gameState = BATTLE;
-				 enemies[i].isTargetPlayer = true;
+				 enemyManager.enemies[i].isTargetingPlayer = true;
 				 //messageBox.Add(Message("Battle start.", 14));
-				 if (enemies[i].position.x == playerPos.x) {
-					 if (enemies[i].position.y < playerPos.y) {
-						 enemies[i].position.y++;
-						 enemies[i].hasMoved = true;
+				 if (enemyManager.enemies[i].position.x == playerPos.x) {
+					 if (enemyManager.enemies[i].position.y < playerPos.y) {
+						 enemyManager.enemies[i].position.y++;
+						 enemyManager.enemies[i].hasMoved = true;
 					 }
 					 else
 					 {
-						 enemies[i].position.y--;
-						 enemies[i].hasMoved = true;
+						 enemyManager.enemies[i].position.y--;
+						 enemyManager.enemies[i].hasMoved = true;
 					 }
 				 }
-				 else if (enemies[i].position.y == playerPos.y) {
-					 if (enemies[i].position.x < playerPos.x)
+				 else if (enemyManager.enemies[i].position.y == playerPos.y) {
+					 if (enemyManager.enemies[i].position.x < playerPos.x)
 					 {
-						 enemies[i].position.x++;
-						 enemies[i].hasMoved = true;
+						 enemyManager.enemies[i].position.x++;
+						 enemyManager.enemies[i].hasMoved = true;
 					 }
 					 else
 					 {
-						 enemies[i].position.x--;
-						 enemies[i].hasMoved = true;
+						 enemyManager.enemies[i].position.x--;
+						 enemyManager.enemies[i].hasMoved = true;
 					 }
 				 }
-				 else if (enemies[i].position.y < playerPos.y && enemies[i].position.x < playerPos.x)
+				 else if (enemyManager.enemies[i].position.y < playerPos.y && enemyManager.enemies[i].position.x < playerPos.x)
 				 {
-					 enemies[i].position.y++;
-					 enemies[i].position.x++;
-					 enemies[i].hasMoved = true;
+					 enemyManager.enemies[i].position.y++;
+					 enemyManager.enemies[i].position.x++;
+					 enemyManager.enemies[i].hasMoved = true;
 				 }
-				 else if (enemies[i].position.y > playerPos.y && enemies[i].position.x > playerPos.x)
+				 else if (enemyManager.enemies[i].position.y > playerPos.y && enemyManager.enemies[i].position.x > playerPos.x)
 				 {
-					 enemies[i].position.y--;
-					 enemies[i].position.x--;
-					 enemies[i].hasMoved = true;
+					 enemyManager.enemies[i].position.y--;
+					 enemyManager.enemies[i].position.x--;
+					 enemyManager.enemies[i].hasMoved = true;
 				 }
-				 else if (enemies[i].position.y > playerPos.y && enemies[i].position.x < playerPos.x)
+				 else if (enemyManager.enemies[i].position.y > playerPos.y && enemyManager.enemies[i].position.x < playerPos.x)
 				 {
-					 --enemies[i].position.y;
-					 ++enemies[i].position.x;
-					 enemies[i].hasMoved = true;
+					 --enemyManager.enemies[i].position.y;
+					 ++enemyManager.enemies[i].position.x;
+					 enemyManager.enemies[i].hasMoved = true;
 				 }
-				 else if (enemies[i].position.y < playerPos.y && enemies[i].position.x > playerPos.x)
+				 else if (enemyManager.enemies[i].position.y < playerPos.y && enemyManager.enemies[i].position.x > playerPos.x)
 				 {
-					 ++enemies[i].position.y;
-					 --enemies[i].position.x;
-					 enemies[i].hasMoved = true;
+					 ++enemyManager.enemies[i].position.y;
+					 --enemyManager.enemies[i].position.x;
+					 enemyManager.enemies[i].hasMoved = true;
 				 }
 			 }
 		} 
@@ -615,15 +607,16 @@ void checkPlayerCollison() {
 
 	//Enemy Collison
 	for (int i = 0; i < ENEMIESLENGTH; ++i) {
-		if ((playerM.player.position.x == enemies[i].position.x) 
-			&& (playerM.player.position.y == enemies[i].position.y)) {
+
+		if ((playerM.player.position.x == enemyManager.enemies[i].position.x)
+			&& (playerM.player.position.y == enemyManager.enemies[i].position.y)) {
 
 			//player.character = 'K';
 			//enemies[i].character = 'O';
 			
-			if (enemies[i].hasMoved) 
+			if (enemyManager.enemies[i].hasMoved)
 			{
-				setPosition(enemies[i].pointer, enemies[i].positionPrevious);
+				enemyManager.enemies[i].position = enemyManager.enemies[i].positionPrevious;
 			}
 
 			if (playerM.player.hasMoved)
@@ -646,15 +639,16 @@ void UIrenderCharA(char a[], int length, Vector2D pos)
 	}
 }
 
-void EnemyDied();
-bool areAllEnemiesDead();
 void damageEnemy(int damage) 
 {
-	(*currentEnemy).health -= damage;
+	currentEnemy->health -= damage;
 
-	if ((*currentEnemy).health <= 0)
+	messageBox.Add(Message("Did " + std::to_string(damage) + " damage to " + currentEnemy->name));
+	messageBox.Add(Message("Remaining HP: " + std::to_string(currentEnemy->health)));
+
+	if (currentEnemy->health <= 0)
 	{
-		(*currentEnemy).isAlive = false;
+		currentEnemy->isAlive = false;
 		//Remove enemy body here
 
 		EnemyDied();
@@ -688,9 +682,10 @@ void EnemyDied()
 
 bool areAllEnemiesDead() 
 {
-	for (Enemy element : enemies) 
+
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
 	{
-		if (element.isAlive) 
+		if (enemyManager.enemies[i].isAlive)
 		{
 			return false;
 		}

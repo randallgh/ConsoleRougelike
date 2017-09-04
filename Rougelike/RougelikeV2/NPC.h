@@ -1,17 +1,22 @@
 #pragma once
 
+#include <string>
+
 #include <Windows.h>::WORD
 #include "PlayerData.h"
 #include "Vector2D.h"
+
 
 class NPC
 {
 public:
 	NPC();
-	NPC(char c, WORD cc, int heal, int atck, int level);
+	NPC(NPC * npc);
+	NPC(char c, WORD cc, std::string name, int heal, int atck, int level);
 	~NPC();
 
 	//Visual
+	std::string name;
 	char character;
 	WORD characterColor;
 
@@ -39,7 +44,7 @@ public:
 
 	bool hasMoved;
 	bool isAlive;
-
+	bool isTargetingPlayer;
 
 	void setPreviousPosition(NPC *npc, Vector2D pos);
 };

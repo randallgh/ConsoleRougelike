@@ -50,7 +50,7 @@ void PlayerManager::heal(int health)
 
 PlayerManager::PlayerManager(char ui[], int width, InfoBox * infoBox)
 {
-	NPC npc ('@', 15, 100, 10, 1);
+	NPC npc ('@', 15, "player", 100, 10, 1);
 	this->player = npc;
 
 	this->width = width;
