@@ -19,7 +19,13 @@ void PlayerManager::printLevel()
 void PlayerManager::printPotions()
 {
 	std::string potion = "Potions: " + std::to_string(this->data.potions) + "/" + std::to_string(this->data.maxPotions);
-	infoBox->AddInfo(static_cast<char*>(ui), width, 7, potion);
+	infoBox->AddInfo(static_cast<char*>(ui), width, 6, potion);
+}
+
+void PlayerManager::printPotionPower()
+{
+	std::string power = "Potion Power: " + std::to_string(this->data.potionPower);
+	infoBox->AddInfo(static_cast<char*>(ui), width, 5, power);
 }
 
 void PlayerManager::printExp()
@@ -64,26 +70,40 @@ void PlayerManager::addExp(int exp)
 		printLevel();
 		data.exp -= data.expToNextLevel;
 
+		++player.attack;
+		player.maxHealth += 10;
+
 		data.expToNextLevel *= 1.5f;
+		addExp(0);
+		printHealth();
 	}
 
 	printExp();
 
 }
 
-void PlayerManager::addPotion(int num)
+bool PlayerManager::addPotion(int num)
 {
+	if (data.potions >= data.maxPotions) 
+	{
+		messageBox->Add(Message("You are full on potions!"));
+		return false;
+	}
+
 	data.potions += num;
+	messageBox->Add(Message("Picked up potion."));
+	printPotions();
 	if (data.potions > data.maxPotions) 
 	{
 		data.potions = data.maxPotions;
 	}
+	return true;
 }
 
 
 PlayerManager::PlayerManager(char ui[], int width, InfoBox * infoBox, MessageBoxUI * messageBox)
 {
-	NPC npc ('@', 15, "player", 100, 10, 1);
+	NPC npc ('@', 15, "player", 100, 10, 90, 1);
 	this->player = npc;
 
 	this->width = width;

@@ -41,6 +41,9 @@ char mapData[WIDTH * MAPHEIGHT];
 char ground = ' ';//249;
 char wall = 178;
 
+int level = 1;
+std::string currentMap = "level1";
+
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
 
@@ -63,11 +66,11 @@ InfoBox infoBox({ 51,0 });
 
 #define MESSAGELENGTH 50
 /*-----Player-----*/
-PlayerManager playerM(uiData, WIDTH, &infoBox, &messageBox);
+PlayerManager playerManager(uiData, WIDTH, &infoBox, &messageBox);
 //Player player;
 
 /*-----Enemies-----*/
-EnemyManager enemyManager(mapData,WIDTH,&messageBox,&playerM);
+EnemyManager enemyManager(mapData,WIDTH,&messageBox,&playerManager);
 
 //Enemy enemies[ENEMIESLENGTH];
 //Enemy slime = {20, 5, 'S', "Slime", true};
@@ -107,12 +110,18 @@ int main()
 
 	printUI();
 
-	importMapFromFile("home.txt");
+	importMapFromFile(currentMap);
+	//importMapFromFile("maps/map.txt");
 
-	playerM.printHealth();
-	playerM.printPotions();
-	playerM.printLevel();
-	playerM.printExp();
+	playerManager.printHealth();
+	playerManager.printPotions();
+	playerManager.printLevel();
+	playerManager.printExp();
+	playerManager.printPotionPower();
+
+	messageBox.Add(Message("Welcome to Rougelike!"));
+	messageBox.Add(Message("Use the arrow keys to move."));
+	messageBox.Add(Message("E to attack. R to restore health."));
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -121,14 +130,14 @@ int main()
 		{
 		case OVERWORLD:
 			input();
-			mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
+			mapData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)] = ground;
 			ai();
 			physics();
 			break;
 
 		case BATTLE:
 			if (input()) {
-				mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
+				mapData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)] = ground;
 				ai();
 				physics();
 			}
@@ -138,10 +147,10 @@ int main()
 		}
 		//Add enemies and player to map
 		enemyManager.printEnemies();
-		mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
+		mapData[playerManager.player.position.x + WIDTH * playerManager.player.position.y] = playerManager.player.character;
 		render();
 
-		Sleep(90);
+		Sleep(100);
 	}
 }
 
@@ -163,9 +172,10 @@ void render()
 
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = tempChar;
 				
-				if (tempChar == playerM.player.character) 
+				//Add color based on char
+				if (tempChar == playerManager.player.character) 
 				{
-					 tempColor = playerM.player.characterColor;
+					 tempColor = playerManager.player.characterColor;
 				}
 				else if (tempChar == ground) 
 				{
@@ -178,6 +188,14 @@ void render()
 				else if (tempChar == 'S') 
 				{
 					tempColor = 11;
+				}
+				else if (tempChar == 'p') 
+				{
+					tempColor = 13;
+				}
+				else if (tempChar == 'D')
+				{
+					tempColor = 12;
 				}
 
 				consoleBuffer[x + WIDTH * y].Attributes = tempColor;
@@ -196,8 +214,87 @@ void render()
 
 bool input() {
 
-	Vector2D *playerPos = &playerM.player.position;
-	playerM.player.setPreviousPosition((*playerPos));
+	Vector2D *playerPos = &playerManager.player.position;
+	playerManager.player.setPreviousPosition((*playerPos));
+
+	//R Key
+	if (GetAsyncKeyState(0x52))
+	{
+
+		if (playerManager.player.health < playerManager.player.maxHealth)
+		{
+			if (playerManager.data.potions > 0)
+			{
+				messageBox.Add(Message("Healed self."));
+				//Heal player
+				playerManager.heal(playerManager.data.potionPower);
+				--playerManager.data.potions;
+				playerManager.printPotions();
+				return true;
+			}
+			else
+			{
+				messageBox.Add(Message("You do not have any potions."));
+			}
+		}
+		else
+		{
+			messageBox.Add(Message("You cannot heal at max health."));
+		}
+
+	}
+
+
+	if (gameState == BATTLE) {
+		//Find the closest enemy
+
+		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
+		{
+			if (enemyManager.currentEnemy == nullptr)
+			{
+				enemyManager.currentEnemy = &enemyManager.enemies[i];
+			}
+
+			NPC * element = &enemyManager.enemies[i];
+			if (element->isTargetingPlayer && element->isAlive)
+			{
+				if (distanceVector2D(element->position, playerManager.player.position)
+					< distanceVector2D(enemyManager.currentEnemy->position, playerManager.player.position)) {
+					enemyManager.currentEnemy = element;
+				}
+
+				if (!enemyManager.currentEnemy->isAlive)
+				{
+					enemyManager.currentEnemy = element;
+				}
+			}
+		}
+
+		//E key Melee
+		if (GetAsyncKeyState(0x45))
+		{
+			//Attack current enemy
+			if ((*enemyManager.currentEnemy).isAlive)
+			{
+				int distance = distanceVector2D((*playerPos), (*enemyManager.currentEnemy).position);
+				if (distance <= 1)
+				{
+					//messageBox.Add(Message("Damage enemy."));
+					if (didProc(playerManager.player.dexterity))
+					{
+						enemyManager.damageCurrentEnemy(playerManager.player.attack);
+					}
+					else
+					{
+						messageBox.Add(Message("Missed attack!"));
+					}
+
+				}
+			}
+			return true;
+		}
+	}
+
 	//North East
 	if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_RIGHT))
 	{	
@@ -212,7 +309,7 @@ bool input() {
 		if ((*playerPos).x >= WIDTH) {
 			(*playerPos).x = (WIDTH - 1);
 		}
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 
 	}
@@ -230,7 +327,7 @@ bool input() {
 		if ((*playerPos).x >= WIDTH) {
 			(*playerPos).x = (WIDTH - 1);
 		}
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 
 	}
@@ -247,7 +344,7 @@ bool input() {
 		if ((*playerPos).x < 0) {
 			(*playerPos).x = 0;
 		}
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 
 	}
@@ -265,7 +362,7 @@ bool input() {
 		if ((*playerPos).x < 0) {
 			(*playerPos).x = 0;   
 		}
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 
 	}
@@ -279,7 +376,7 @@ bool input() {
 		}
 		//Message move("playerM.player moved north.", 20);
 		//messageBox.Add(move);
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 	}
 	//South
@@ -292,7 +389,7 @@ bool input() {
 		}
 		//Message move("Player moved south.", 20);
 		//messageBox.Add(move);
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 	}
 	//East
@@ -306,7 +403,7 @@ bool input() {
 		//Message move("Player moved east.", 19);
 		//messageBox.Add(move)
 
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 	}
 	//West
@@ -320,44 +417,28 @@ bool input() {
 		
 		//Message move("Player moved west.", 19);
 		//messageBox.Add(move);
-		playerM.player.hasMoved = true;
+		playerManager.player.hasMoved = true;
 		return true;
 
 	}
 
-	playerM.player.hasMoved = false;
+	playerManager.player.hasMoved = false;
 
 
 	//Button to press to recover health: R key
 	//Calls a function to heal
 	//Removes a potion from the player
-	if (GetAsyncKeyState(0x52)) //R key
-	{
 
-		if (playerM.player.health < playerM.player.maxHealth) 
-		{
-			if (playerM.data.potions > 0)
-			{
-				messageBox.Add(Message("Healed self."));
-				//Heal player
-				playerM.heal(playerM.data.potionPower);
-				--playerM.data.potions;
-				playerM.printPotions();
-				return true;
-			}
-			else
-			{
-				messageBox.Add(Message("You do not have anymore potions."));
-			}
-		} 
-		else
-		{
-			messageBox.Add(Message("You cannot heal at max health."));
-		}
-		
-	}
+	////Debug Key Period
+	//if (GetAsyncKeyState(VK_OEM_PERIOD)) {
+	//	importMapFromFile("maps/level1.txt");
+	//}
 
+	//if (GetAsyncKeyState(VK_OEM_COMMA)) {
+	//	importMapFromFile("maps/level2.txt");
+	//}
 
+	//Escape
 	if (GetAsyncKeyState(VK_ESCAPE)) {
 		isRunning = false;
 	}
@@ -366,50 +447,6 @@ bool input() {
 	//	damagePlayer(10);
 	//	messageBox.Clear(uiData, WIDTH, 50);
 	//}
-
-
-	if (gameState == BATTLE) {
-		//Find the closest enemy
-
-		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
-		{
-			if (enemyManager.currentEnemy == nullptr) 
-			{
-				enemyManager.currentEnemy = &enemyManager.enemies[i];
-			}
-
-			NPC * element = &enemyManager.enemies[i];
-			if (element->isTargetingPlayer && element->isAlive)
-			{
-				if (distanceVector2D(element->position, playerM.player.position)
-					< distanceVector2D(enemyManager.currentEnemy->position, playerM.player.position)){
-					enemyManager.currentEnemy = element;
-				}
-
-				if (!enemyManager.currentEnemy->isAlive)
-				{
-					enemyManager.currentEnemy = element;
-				}
-			}
-		}
-
-		//Button to melee attack
-		if (GetAsyncKeyState(0x45)) //E key
-		{
-			//Attack current enemy
-			if ((*enemyManager.currentEnemy).isAlive)
-			{
-				int distance = distanceVector2D((*playerPos), (*enemyManager.currentEnemy).position);
-				if (distance <= 2)
-				{
-					//messageBox.Add(Message("Damage enemy."));
-					enemyManager.damageCurrentEnemy(playerM.player.attack);
-				}
-			}
-			return true;
-		}
-	}
-
 
 }
 
@@ -432,27 +469,35 @@ void ai()
 	float distance;
 	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
 	{
-		Vector2D playerPos = playerM.player.positionPrevious;
+		Vector2D playerPos = playerManager.player.positionPrevious;
 		 distance = distanceVector2D(enemyManager.enemies[i].position, playerPos);
 		 
 		 if (enemyManager.enemies[i].isAlive)
 		 {
-			 if (distance <= 2)
+			 if (distance <= 1)
 			 {
 				 //Damageplayer
-				 int damage = enemyManager.enemies[i].attack;
+				 if (didProc(enemyManager.enemies[i].dexterity)) 
+				 {
+					 int damage = enemyManager
+						 .enemies[i].attack;
 
-				 std::string damageS = enemyManager.enemies[i].name + " did " 
-									+ std::to_string(damage) + " damage to player";
-				 //damageS.append();
-				 Message attack(damageS);
+					 std::string damageS = enemyManager.enemies[i].name + " did "
+						 + std::to_string(damage) + " damage to player";
+					 //damageS.append();
+					 Message attack(damageS);
 
-				 messageBox.Add(attack);
+					 messageBox.Add(attack);
 
-				 playerM.damage(damage);
-				 playerM.printHealth();
+					 playerManager.damage(damage);
+					 playerManager.printHealth();
+				 } 
+				 else 
+				 {
+					 messageBox.Add(Message(enemyManager.enemies[i].name + " missed."));
+				 }
 			 }
-			 else if (distance >= 2 && distance < 15) {
+			 else if (distance >= 1 && distance < 15) {
 				 gameState = BATTLE;
 				 enemyManager.enemies[i].isTargetingPlayer = true;
 				 //messageBox.Add(Message("Battle start.", 14));
@@ -523,21 +568,27 @@ void physics() {
 	//Enemy Collison
 	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) {
 		
-		if (isSameVectors(playerM.player.position, enemyManager.enemies[i].position)
+		if (isSameVectors(playerManager.player.position, enemyManager.enemies[i].position)
 			&& enemyManager.enemies[i].isAlive) 
 		{
 
 			//player.character = 'K';
 			//enemies[i].character = 'O';
-			
-			if (enemyManager.enemies[i].hasMoved)
+			if (enemyManager.enemies[i].hasMoved && playerManager.player.hasMoved) 
 			{
 				enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
 			}
-
-			if (playerM.player.hasMoved)
+			else
 			{
-				playerM.player.setPosition(playerM.player.positionPrevious);
+				if (enemyManager.enemies[i].hasMoved)
+				{
+					enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+				}
+
+				if (playerManager.player.hasMoved)
+				{
+					playerManager.player.setPosition(playerManager.player.positionPrevious);
+				}
 			}
 		}
 	}
@@ -555,11 +606,24 @@ void physics() {
 		}
 	}
 
-	int playerPos = playerM.player.position.x + WIDTH * playerM.player.position.y;
+	int playerPos = playerManager.player.position.x + WIDTH * playerManager.player.position.y;
 
 	if (mapData[playerPos] == wall) 
 	{
-		playerM.player.setPosition(playerM.player.positionPrevious);
+		playerManager.player.setPosition(playerManager.player.positionPrevious);
+	}
+	if (mapData[playerPos] == 'p') 
+	{
+		bool isTrue = playerManager.addPotion(1);
+		if (!isTrue) 
+		{
+			playerManager.player.setPosition(playerManager.player.positionPrevious);
+		}
+	}
+	if (mapData[playerPos] == '>')
+	{
+		++level;
+		importMapFromFile("level" + std::to_string(level));
 	}
 
 	//If the player is on a wall send them back
@@ -567,10 +631,25 @@ void physics() {
 
 void importMapFromFile(std::string fileName) 
 {
+	std::string destination = "maps/" + fileName + ".txt";
+
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
+	{
+		enemyManager.enemies[i].isAlive = false;
+		enemyManager.enemies[i].health = 0;
+		enemyManager.enemies[i].character = ' ';
+	}
+
+	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
+
+	{
+		mapData[i] = ground;
+	}
+
 	std::ifstream input;
 	std::string inputString;
 
-	input.open(fileName);
+	input.open(destination);
 
 	if (input.is_open()) 
 	{
@@ -593,7 +672,11 @@ void importMapFromFile(std::string fileName)
 	S - add a enemy at that position
 	*/
 
-	NPC slime('S', 15, "Slime", 20, 5, 1);
+	NPC slime('S', 15, "Slime", 20, 5, 80, 1);
+	NPC dragon('D', 15, "Dragon", 200, 10, 80, 5);
+
+	slime.exp = 10;
+	dragon.exp = 100;
 
 	for (int y = 0; y < MAPHEIGHT; ++y) 
 	{
@@ -602,11 +685,14 @@ void importMapFromFile(std::string fileName)
 			switch (mapData[x + WIDTH * y])
 			{
 			case '@':
-				playerM.player.position = { x,y };
+				playerManager.player.position = { x,y };
 				break;
 			case 'S':
 				//messageBox.Add(Message("Add enemy"));
 				enemyManager.addEnemy(slime, { x,y });
+				break;
+			case 'D':
+				enemyManager.addEnemy(dragon, { x,y });
 				break;
 			case 'w':
 				mapData[x + WIDTH * y] = wall;
@@ -620,7 +706,6 @@ void importMapFromFile(std::string fileName)
 	}
 
 	input.close();
-	
 }
 
 void outputMapFromMem(std::string fileName) 

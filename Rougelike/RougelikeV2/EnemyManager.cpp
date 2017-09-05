@@ -13,10 +13,10 @@ EnemyManager::EnemyManager(char map[], int width, MessageBoxUI * messageBox, Pla
 	this->messageBox = messageBox;
 	this->playerManager = playerManager;
 
-	for (int i = 0; i < MAXENEMIES; ++i) 
-	{
-		this->enemies->name = "TEST";
-	}
+	//for (int i = 0; i < MAXENEMIES; ++i) 
+	//{
+	//	this->enemies->name = "TEST";
+	//}
 }
 
 bool EnemyManager::areAllDead()
@@ -35,7 +35,6 @@ bool EnemyManager::areAllDead()
 void EnemyManager::damageCurrentEnemy(int damage)
 {
 	currentEnemy->health -= damage;
-
 	messageBox->Add(Message("Did " + std::to_string(damage) + " damage to " + currentEnemy->name));
 
 
@@ -45,9 +44,10 @@ void EnemyManager::damageCurrentEnemy(int damage)
 		//Remove enemy body here
 
 		messageBox->Add(Message("The " + currentEnemy->name + " was defeated!"));
-		playerManager->addPotion(1);
-		playerManager->addExp(10);
+		//playerManager->addPotion(1);
+		playerManager->addExp(currentEnemy->exp);
 		playerManager->printPotions();
+		currentEnemy->character = ' ';
 
 		if (areAllDead())
 		{
@@ -92,6 +92,9 @@ bool EnemyManager::addEnemy(NPC npc, Vector2D pos)
 void EnemyManager::printEnemies()
 {
 	for (NPC element : this->enemies) {
-		static_cast<char*>(map)[element.position.x + width * element.position.y] = element.character;
+		if (element.isAlive) 
+		{
+			static_cast<char*>(map)[element.position.x + width * element.position.y] = element.character;
+		}
 	}
 }

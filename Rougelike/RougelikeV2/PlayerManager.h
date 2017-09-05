@@ -18,6 +18,7 @@ public:
 	void printLevel();
 	void printPotions();
 	void printExp();
+	void printPotionPower();
 
 	//Player data
 	NPC player;
@@ -26,7 +27,7 @@ public:
 	void damage(int damage);
 	void heal(int health);
 	void addExp(int exp);
-	void addPotion(int num);
+	bool addPotion(int num);
 
 	PlayerManager(char ui[], int width, InfoBox * infoBox, MessageBoxUI * messageBox);
 	~PlayerManager();

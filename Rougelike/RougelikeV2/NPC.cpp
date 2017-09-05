@@ -18,6 +18,9 @@ NPC::NPC(NPC * npc)
 
 	this->attack			= npc->attack;
 	this->level				= npc->level;
+	this->dexterity			= npc->dexterity;
+
+	this->exp				= npc->exp;
 
 	this->isAlive			= npc->isAlive;
 
@@ -29,7 +32,7 @@ NPC::NPC(NPC * npc)
 }
 
 
-NPC::NPC(char c, WORD cc, std::string name, int heal, int atck, int level)
+NPC::NPC(char c, WORD cc, std::string name, int heal, int atck, int dexterity, int level)
 {
 	this->character = c;
 	this->characterColor = cc;
@@ -37,6 +40,8 @@ NPC::NPC(char c, WORD cc, std::string name, int heal, int atck, int level)
 
 	this->health = heal;
 	this->maxHealth = heal;
+
+	this->dexterity = dexterity;
 
 	this->attack = atck;
 	this->level = level;

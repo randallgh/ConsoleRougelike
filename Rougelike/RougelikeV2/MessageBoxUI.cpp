@@ -52,6 +52,12 @@ void MessageBoxUI::Add(Message mes)
 	messages[0] = mes;
 }
 
+//void MessageBoxUI::Add(std::string mes)
+//{
+//	Message tempMessage(mes);
+//	Add(mes);
+//}
+
 
 MessageBoxUI::~MessageBoxUI()
 {

@@ -1,4 +1,6 @@
 #pragma once
+#include <string>
+
 #include "Message.h"::Message
 #include "Vector2D.h"::Vector2D
 
@@ -16,6 +18,7 @@ public:
 	void Clear(char ui[], int uiWidth, int messageLength);
 	void Print(char ui[], int uiWidth, int messageLength);
 	void Add(Message mes);
+	//void Add(std::string mes);
 
 	~MessageBoxUI();
 };
