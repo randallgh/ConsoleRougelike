@@ -20,7 +20,7 @@ EnemyManager::EnemyManager(char map[], int width)
 
 bool EnemyManager::areAllDead()
 {
-	for (int i = 0; i < getMaxEnemies(); ++i)
+	for (int i = 0; i < MAXENEMIES; ++i)
 	{
 		if (enemies[i].isAlive)
 		{

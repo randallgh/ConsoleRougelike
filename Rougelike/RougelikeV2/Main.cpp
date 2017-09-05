@@ -1,4 +1,4 @@
-#include <windows.h> /* for HANDLE type, and console functions */
+﻿#include <windows.h> /* for HANDLE type, and console functions */
 #include <stdio.h> /* standard input/output */
 #include <stdlib.h> /* included for rand */
 #include <chrono>
@@ -38,7 +38,8 @@ bool isRunning = true;
 /*-----Map-----*/
 char mapData[WIDTH * MAPHEIGHT];
 
-char ground = '.';//249;
+char ground = ' ';//249;
+char wall = 178;
 
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
@@ -68,8 +69,6 @@ PlayerManager playerM(uiData, WIDTH, &infoBox);
 /*-----Enemies-----*/
 EnemyManager enemyManager(mapData,WIDTH);
 
-#define ENEMIESLENGTH 2
-
 //Enemy enemies[ENEMIESLENGTH];
 //Enemy slime = {20, 5, 'S', "Slime", true};
 
@@ -80,8 +79,9 @@ NPC *currentEnemy;
 
 void render();
 bool input();
-//void checkPlayerCollison();
 void ai();
+void physics();
+
 
 //Random
 bool didProc(int prob);
@@ -93,13 +93,17 @@ void UIrenderCharA(char a[], int length, Vector2D pos);
 void printUI();
 
 //Map
-void defaultMapToFile();
+//void defaultMapToFile();
+void outputMapFromMem(std::string fileName);
+void importMapFromFile(std::string fileName);
+
 
 void EnemyDied();
 
 
 int main()
 {
+
 	srand(time(0));
 
 	/* initialize handles */
@@ -126,10 +130,10 @@ int main()
 
 	/*-----------Map Generation----------*/
 
-	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
+	/*for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
 	{
 		mapData[i] = ground;
-	}
+	}*/
 
 	//UI Generation
 	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
@@ -139,31 +143,29 @@ int main()
 
 	printUI();
 
-	//Add enemies to map
-	NPC slime('S',15,"Slime",20,5,1);
+	importMapFromFile("home.txt");
 
-	enemyManager.addEnemy(slime, { 10, 20 });
-	enemyManager.addEnemy(slime, { 20, 20 });
+	//Add enemies to map
+	
+
+	//enemyManager.addEnemy(slime, { 10, 20 });
+	//enemyManager.addEnemy(slime, { 20, 20 });
 
 	//Add player to pos
-	playerM.player.position = { 0, 0 };
+	//playerM.player.position = { 0, 0 };
 	//mapData[player.position.x * player.position.y] = player.character;
 
 	playerM.printHealth();
 	playerM.printPotions();
 	playerM.printLevel();
 
-	enemyManager.printEnemies();
-
-	for (NPC element : enemyManager.enemies) {
-		mapData[element.position.x + WIDTH * element.position.y] = element.character;
-	}
+	//enemyManager.printEnemies();
 
 	//TODO add to player manager
-	mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
+	//mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
 
+	//outputMapFromMem("map.txt");
 	//defaultMapToFile();
-
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -179,6 +181,7 @@ int main()
 
 			//Move enemies
 			ai();
+			physics();
 
 
 			//Check for collison
@@ -191,6 +194,7 @@ int main()
 			if (input()) {
 				mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
 				ai();
+				physics();
 			}
 
 			break;
@@ -217,14 +221,36 @@ void render()
 	messageBox.Print(uiData, WIDTH, 50);
 
 	char tempChar;
+	WORD tempColor;
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) 
 	{
 		for (x = 0; x < WIDTH; ++x) 
 		{
 			if ((x + WIDTH * ((MAPHEIGHT - 1) - y))  >= 0) {
-				consoleBuffer[x + WIDTH * y].Char.AsciiChar = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
-				consoleBuffer[x + WIDTH * y].Attributes = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+				tempChar = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+
+				consoleBuffer[x + WIDTH * y].Char.AsciiChar = tempChar;
+				
+				if (tempChar == playerM.player.character) 
+				{
+					 tempColor = playerM.player.characterColor;
+				}
+				else if (tempChar == ground) 
+				{
+					tempColor = 10;
+				}
+				else if (tempChar == wall)
+				{
+					tempColor = 6;
+				}
+				else if (tempChar == 'S') 
+				{
+					tempColor = 11;
+				}
+
+				consoleBuffer[x + WIDTH * y].Attributes = tempColor;
+
 			} 
 			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
@@ -240,13 +266,10 @@ void render()
 bool input() {
 
 	Vector2D *playerPos = &playerM.player.position;
-
+	playerM.player.setPreviousPosition((*playerPos));
 	//North East
 	if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_RIGHT))
-	{
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-		//setPreviousPosition(playerM.player.pointer, (*playerPos));
-		
+	{	
 		++(*playerPos).y;
 		++(*playerPos).x;
 
@@ -265,8 +288,6 @@ bool input() {
 	//South East
 	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_RIGHT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-
 		--(*playerPos).y;
 		++(*playerPos).x;
 		
@@ -285,8 +306,6 @@ bool input() {
 	//South West
 	else if (GetAsyncKeyState(VK_DOWN) && GetAsyncKeyState(VK_LEFT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-
 		--(*playerPos).y;
 		--(*playerPos).x;
 
@@ -304,8 +323,6 @@ bool input() {
 	//North West
 	else if (GetAsyncKeyState(VK_UP) && GetAsyncKeyState(VK_LEFT))
 	{
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-
 		++(*playerPos).y;
 		--(*playerPos).x;
 
@@ -324,11 +341,6 @@ bool input() {
 	//North
 	else if (GetAsyncKeyState(VK_UP))
 	{
-		
-		/*previousChar = mapData[(*playerPos).x + WIDTH * (*playerPos).y];*/
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-		//previousPos = (player.position.x + WIDTH * player.position.y);
-
 		(*playerPos).y++;
 
 		if ((*playerPos).y >= MAPHEIGHT) {
@@ -342,11 +354,6 @@ bool input() {
 	//South
 	else if (GetAsyncKeyState(VK_DOWN))
 	{
-		
-		/*previousChar = mapData[(*playerPos).x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-		//previousPos = (player.position.x + WIDTH * player.position.y);
-
 		(*playerPos).y--;
 
 		if ((*playerPos).y <= 0) {
@@ -360,10 +367,6 @@ bool input() {
 	//East
 	else if (GetAsyncKeyState(VK_RIGHT))
 	{
-		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-		//previousPos = (player.position.x + WIDTH * player.position.y);
-
 		(*playerPos).x++;
 
 		if ((*playerPos).x >= WIDTH) {
@@ -378,11 +381,6 @@ bool input() {
 	//West
 	else if (GetAsyncKeyState(VK_LEFT))
 	{
-		
-		/*previousChar = mapData[player.position.x + WIDTH * player.position.y];*/
-		playerM.player.setPreviousPosition(&playerM.player, (*playerPos));
-		//previousPos = (player.position.x + WIDTH * player.position.y);
-
 		(*playerPos).x--;
 
 		if ((*playerPos).x < 0) {
@@ -485,9 +483,9 @@ bool input() {
 
 void ai() 
 {
-	for (int i = 0; i < ENEMIESLENGTH; ++i) {
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) {
 
-		enemyManager.enemies[i].setPreviousPosition(&enemyManager.enemies[i], enemyManager.enemies[i].position);
+		enemyManager.enemies[i].setPreviousPosition(enemyManager.enemies[i].position);
 		//setPreviousPosition(enemies[i].pointer, enemies[i].position);
 		mapData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIDTH)] = ground;
 	}
@@ -500,7 +498,7 @@ void ai()
 		-Choose the quickest route to the player
 	*/
 	float distance;
-	for (int i = 0; i < ENEMIESLENGTH; ++i)
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
 	{
 		Vector2D playerPos = playerM.player.positionPrevious;
 		 distance = distanceVector2D(enemyManager.enemies[i].position, playerPos);
@@ -574,7 +572,12 @@ void ai()
 					 enemyManager.enemies[i].hasMoved = true;
 				 }
 			 }
-		} 
+		 }
+		 if (enemyManager.enemies[i].position.x == enemyManager.enemies[i].positionPrevious.x
+			 && enemyManager.enemies[i].position.y == enemyManager.enemies[i].positionPrevious.y)
+		 {
+			 enemyManager.enemies[i].hasMoved = false;
+		 }
 	}
 
 
@@ -582,34 +585,51 @@ void ai()
 
 }
 
-//void checkPlayerCollison() {
-//	//If the player and any enemy have the same positon
-//
-//	//Enemy Collison
-//	for (int i = 0; i < ENEMIESLENGTH; ++i) {
-//
-//		if ((playerM.player.position.x == enemyManager.enemies[i].position.x)
-//			&& (playerM.player.position.y == enemyManager.enemies[i].position.y)) {
-//
-//			//player.character = 'K';
-//			//enemies[i].character = 'O';
-//			
-//			if (enemyManager.enemies[i].hasMoved)
-//			{
-//				enemyManager.enemies[i].position = enemyManager.enemies[i].positionPrevious;
-//			}
-//
-//			if (playerM.player.hasMoved)
-//			{
-//				playerM.player.setPreviousPosition(&playerM.player, playerM.player.positionPrevious);
-//			}
-//			
-//			break;
-//		}
-//	}
-//
-//	//Wall Collsion
-//}
+void physics() {
+	//If the player and any enemy have the same positon
+
+	//Enemy Collison
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) {
+		
+		if (isSameVectors(playerM.player.position, enemyManager.enemies[i].position)) {
+
+			//player.character = 'K';
+			//enemies[i].character = 'O';
+			
+			if (enemyManager.enemies[i].hasMoved)
+			{
+				enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+			}
+
+			if (playerM.player.hasMoved)
+			{
+				playerM.player.setPosition(playerM.player.positionPrevious);
+			}
+		}
+	}
+
+	//Wall Collsion
+
+	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
+	{
+		//If the new position is on a wall send the enemy back a space
+		//Implement walls as a object and refer to those positions rather then map data
+		int pos = enemyManager.enemies[i].position.x + WIDTH * enemyManager.enemies[i].position.y;
+		if (mapData[pos] == wall) 
+		{
+			enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+		}
+	}
+
+	int playerPos = playerM.player.position.x + WIDTH * playerM.player.position.y;
+
+	if (mapData[playerPos] == wall) 
+	{
+		playerM.player.setPosition(playerM.player.positionPrevious);
+	}
+
+	//If the player is on a wall send them back
+}
 
 void UIrenderCharA(char a[], int length, Vector2D pos) 
 {
@@ -660,29 +680,107 @@ void EnemyDied()
 	playerM.printPotions();
 }
 
-void defaultMapToFile() 
+//void defaultMapToFile() 
+//{
+//	/*--------------------------Output default map---------------------------*/
+//	std::string outputMapS;
+//	std::ofstream outputMap;
+//	char outputMapCharA[WIDTH * MAPHEIGHT] = { ' ' };
+//
+//	outputMap.open("defaultMap.txt");
+//
+//	//Get a string of data
+//	for (int y = 0; y < MAPHEIGHT; ++y) {
+//		for (int x = 0; x < WIDTH; ++x) {
+//			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+//		}
+//		outputMap << outputMapCharA << "\n";
+//	}
+//
+//	outputMap.close();
+//
+//	//Add it to the file
+//
+//
+//	/*-------------------------------------------------------------------------*/
+//}
+
+void importMapFromFile(std::string fileName) 
 {
-	/*--------------------------Output default map---------------------------*/
-	std::string outputMapS;
-	std::ofstream outputMap;
-	char outputMapCharA[WIDTH * MAPHEIGHT] = { ' ' };
+	std::ifstream input;
+	std::string inputString;
 
-	outputMap.open("defaultMap.txt");
+	input.open(fileName);
 
-	//Get a string of data
-	for (int y = 0; y < MAPHEIGHT; ++y) {
-		for (int x = 0; x < WIDTH; ++x) {
-			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+	if (input.is_open()) 
+	{
+		int y = 0;
+		while (getline(input, inputString)) 
+		{
+			//Take a line
+			//Add the line to a
+			messageBox.Add(Message("Added line"));
+			for (int x = 0; x < WIDTH; ++x) 
+			{
+				mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)] = inputString.at(x);
+			}
+
+			++y;
 		}
-		outputMap << outputMapCharA << "\n";
 	}
 
-	outputMap.close();
+	/*
+	Loop through each char looking for
+	W - wall
+	@ - set player position
+	S - add a enemy at that position
+	*/
 
-	//Add it to the file
+	NPC slime('S', 15, "Slime", 20, 5, 1);
 
+	for (int y = 0; y < MAPHEIGHT; ++y) 
+	{
+		for (int x = 0; x < WIDTH; ++x) 
+		{
+			switch (mapData[x + WIDTH * y])
+			{
+			case '@':
+				playerM.player.position = { x,y };
+				break;
+			case 'S':
+				//messageBox.Add(Message("Add enemy"));
+				enemyManager.addEnemy(slime, { x,y });
+				break;
+			case 'w':
+				mapData[x + WIDTH * y] = wall;
+				break;
+			case '.':
+				mapData[x + WIDTH * y] = ' ';
+			default:
+				break;
+			}
+		}
+	}
 
-	/*-------------------------------------------------------------------------*/
+	input.close();
+	
+}
+
+void outputMapFromMem(std::string fileName) 
+{
+	std::string outputMapString;
+	std::ofstream output;
+	char outputCharA[WIDTH * MAPHEIGHT] = { ' ' };
+
+	output.open(fileName);
+
+	for (int y = 0; y < MAPHEIGHT; ++y) {
+		for (int x = 0; x < WIDTH; ++x) {
+			outputCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+		}
+		output << outputCharA << "\n";
+	}
+
 }
 
 void printUI() 

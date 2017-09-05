@@ -53,8 +53,14 @@ NPC::~NPC()
 }
 
 
-void NPC::setPreviousPosition(NPC * npc, Vector2D pos)
+void NPC::setPreviousPosition(Vector2D pos)
 {
-	(*npc).positionPrevious.x = pos.x;
-	(*npc).positionPrevious.y = pos.y;
+	this->positionPrevious.x = pos.x;
+	this->positionPrevious.y = pos.y;
+}
+
+void NPC::setPosition(Vector2D pos)
+{
+	this->position.x = pos.x;
+	this->position.y = pos.y;
 }

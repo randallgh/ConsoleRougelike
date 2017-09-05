@@ -46,7 +46,8 @@ public:
 	bool isAlive;
 	bool isTargetingPlayer;
 
-	void setPreviousPosition(NPC *npc, Vector2D pos);
+	void setPreviousPosition(Vector2D pos);
+	void setPosition(Vector2D pos);
 };
 
 struct Drops

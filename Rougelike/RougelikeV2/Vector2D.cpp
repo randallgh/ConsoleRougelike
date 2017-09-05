@@ -10,3 +10,12 @@ float distanceVector2D(Vector2D a, Vector2D b) {
 int vectorToFlatArray(Vector2D vec, int width) {
 	return vec.x + width * vec.y;
 }
+
+bool isSameVectors(Vector2D a, Vector2D b)
+{
+	if (a.x == b.x && a.y == b.y) 
+	{
+		return true;
+	}
+	return false;
+}

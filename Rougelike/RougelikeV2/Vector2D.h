@@ -9,3 +9,4 @@ struct Vector2D
 
 float distanceVector2D(Vector2D a, Vector2D b);
 int vectorToFlatArray(Vector2D vec, int width);
+bool isSameVectors(Vector2D a, Vector2D b);
