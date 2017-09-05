@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <Windows.h>::WORD
 
 class Message
 {
@@ -11,6 +12,7 @@ public:
 
 	char data[50];
 	int length = 50;
+	WORD color;
 
 	~Message();
 	

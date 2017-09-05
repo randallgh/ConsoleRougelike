@@ -5,19 +5,15 @@
 //
 //}
 
-
-EnemyManager::EnemyManager(char map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager)
+EnemyManager::EnemyManager(GameObject map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager, GameManager * gameManager)
 {
 	this->map = map;
 	this->width = width;
 	this->messageBox = messageBox;
 	this->playerManager = playerManager;
-
-	//for (int i = 0; i < MAXENEMIES; ++i) 
-	//{
-	//	this->enemies->name = "TEST";
-	//}
+	this->gameManager = gameManager;
 }
+
 
 bool EnemyManager::areAllDead()
 {
@@ -98,7 +94,8 @@ void EnemyManager::printEnemies()
 	for (NPC element : this->enemies) {
 		if (element.isAlive) 
 		{
-			static_cast<char*>(map)[element.position.x + width * element.position.y] = element.character;
+			static_cast<GameObject*>(map)[element.position.x + width * element.position.y].character = element.character;
+			static_cast<GameObject*>(map)[element.position.x + width * element.position.y].color = element.color;
 		}
 	}
 }

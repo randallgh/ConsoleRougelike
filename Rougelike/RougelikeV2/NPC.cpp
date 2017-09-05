@@ -11,7 +11,7 @@ NPC::NPC()
 NPC::NPC(NPC * npc)
 {
 	this->character			= npc->character;
-	this->characterColor	= npc->characterColor;
+	this->color	= npc->color;
 
 	this->health			= npc->health;
 	this->maxHealth			= npc->health;
@@ -35,7 +35,7 @@ NPC::NPC(NPC * npc)
 NPC::NPC(char c, WORD cc, std::string name, int heal, int atck, int dexterity, int level)
 {
 	this->character = c;
-	this->characterColor = cc;
+	this->color = cc;
 	this->name = name;
 
 	this->health = heal;

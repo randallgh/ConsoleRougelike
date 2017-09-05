@@ -18,7 +18,7 @@ public:
 	//Visual
 	std::string name;
 	char character;
-	WORD characterColor;
+	WORD color;
 
 	//Position
 	Vector2D position;

@@ -1,26 +1,18 @@
-﻿  PlayerManager.cpp
+﻿  Main.cpp
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\npc.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\playermanager.cpp(83): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
-  Main.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\npc.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(42): warning C4309: 'initializing': truncation of constant value
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(103): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(281): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(305): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(766): warning C4309: '=': truncation of constant value
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(772): warning C4309: '=': truncation of constant value
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(775): warning C4309: '=': truncation of constant value
-  Generating Code...
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(482): warning C4715: 'input': not all control paths return a value
-  Skipping... (no relevant changes detected)
-  EnemyManager.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\gameobject.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(35): warning C4309: 'initializing': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(85): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(249): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(273): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(750): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(756): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(759): warning C4309: '=': truncation of constant value
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(450): warning C4715: 'input': not all control paths return a value
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)

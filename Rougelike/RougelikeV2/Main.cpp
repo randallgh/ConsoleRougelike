@@ -11,32 +11,25 @@
 
 #include "PlayerManager.h"
 #include "EnemyManager.h"
+#include "GameManager.h"
 //#include "Player.h"
 //#include "Enemy.h"
 
 #include "Message.h"
 #include "MessageBoxUI.h"
 
+#include "GameObject.h"
+
 #include "InfoBox.h"
 
 #include "Window.h"
-
-//States
-
-enum GameStates
-{
-	OVERWORLD,
-	BATTLE
-};
-
-GameStates gameState = OVERWORLD;
-
 
 /*-------------------------------DATA----------------------------------*/
 bool isRunning = true;
 
 /*-----Map-----*/
-char mapData[WIDTH * MAPHEIGHT];
+//char mapData[WIDTH * MAPHEIGHT];
+GameObject levelData[WIDTH * MAPHEIGHT];
 
 char ground = ' ';//249;
 char wall = 178;
@@ -57,26 +50,15 @@ char healthA[PLAYERHEALTHLENGTH] = {};
 MessageBoxUI messageBox({0,0});
 
 InfoBox infoBox({ 51,0 });
-
-//  PrintMessage("Player moved right")
-//std::string wMes = "Welcome";
-
-//Message welcome(wMes, 8);
-
-
 #define MESSAGELENGTH 50
+
+GameManager gameManager;
 /*-----Player-----*/
 PlayerManager playerManager(uiData, WIDTH, &infoBox, &messageBox);
 //Player player;
 
 /*-----Enemies-----*/
-EnemyManager enemyManager(mapData,WIDTH,&messageBox,&playerManager);
-
-//Enemy enemies[ENEMIESLENGTH];
-//Enemy slime = {20, 5, 'S', "Slime", true};
-
-/*----Battle----*/
-
+EnemyManager enemyManager(levelData,WIDTH,&messageBox,&playerManager,&gameManager);
 
 /*---------------------------------------------------------------------*/
 
@@ -103,10 +85,19 @@ int main()
 	srand(time(0));
 	initWindow();
 
+
 	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
 	{
 		uiData[i] = ' ';
 	}
+
+	for (int y = 0; y < MAPHEIGHT; ++y)
+	{
+		for (int x = 0; x < WIDTH; ++x) {
+			levelData[x + WIDTH * y].position = { x,y };
+		}
+	}
+
 
 	printUI();
 
@@ -124,22 +115,23 @@ int main()
 	messageBox.Add(Message("Welcome to Rougelike!"));
 	messageBox.Add(Message("Use the arrow keys to move."));
 	messageBox.Add(Message("E to attack. R to use bow. H to restore health."));
+	messageBox.Add(Message("Head to the > to challange the dragon."));
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
 
-		switch (gameState)
+		switch (gameManager.gameState)
 		{
-		case OVERWORLD:
+		case gameManager.OVERWORLD:
 			input();
-			mapData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)] = ground;
+			levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)].character = ground;
 			ai();
 			physics();
 			break;
 
-		case BATTLE:
+		case gameManager.BATTLE:
 			if (input()) {
-				mapData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)] = ground;
+				levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)].character = ground;
 				ai();
 				physics();
 			}
@@ -149,7 +141,8 @@ int main()
 		}
 		//Add enemies and player to map
 		enemyManager.printEnemies();
-		mapData[playerManager.player.position.x + WIDTH * playerManager.player.position.y] = playerManager.player.character;
+		levelData[playerManager.player.position.x + WIDTH * playerManager.player.position.y].character = playerManager.player.character;
+		levelData[playerManager.player.position.x + WIDTH * playerManager.player.position.y].color = playerManager.player.color;
 		render();
 
 		Sleep(100);
@@ -162,46 +155,20 @@ void render()
 	messageBox.Clear(uiData, WIDTH, 50);
 	messageBox.Print(uiData, WIDTH, 50);
 
-	char tempChar = 0;
-	WORD tempColor = 0;
+	GameObject tempObject;
+
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) 
 	{
 		for (x = 0; x < WIDTH; ++x) 
 		{
 			if ((x + WIDTH * ((MAPHEIGHT - 1) - y))  >= 0) {
-				tempChar = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
 
-				consoleBuffer[x + WIDTH * y].Char.AsciiChar = tempChar;
+				tempObject = levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+
+				consoleBuffer[x + WIDTH * y].Char.AsciiChar = tempObject.character;
+				consoleBuffer[x + WIDTH * y].Attributes = tempObject.color;
 				
-				//Add color based on char
-				if (tempChar == playerManager.player.character) 
-				{
-					 tempColor = playerManager.player.characterColor;
-				}
-				else if (tempChar == ground) 
-				{
-					tempColor = 10;
-				}
-				else if (tempChar == wall)
-				{
-					tempColor = 6;
-				}
-				else if (tempChar == 'S') 
-				{
-					tempColor = 11;
-				}
-				else if (tempChar == 'p') 
-				{
-					tempColor = 13;
-				}
-				else if (tempChar == 'D')
-				{
-					tempColor = 12;
-				}
-
-				consoleBuffer[x + WIDTH * y].Attributes = tempColor;
-
 			} 
 			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
 				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
@@ -247,7 +214,7 @@ bool input() {
 	}
 
 
-	if (gameState == BATTLE) {
+	if (gameManager.gameState == gameManager.BATTLE) {
 		//Find the closest enemy
 
 		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
@@ -488,7 +455,7 @@ void ai()
 
 		enemyManager.enemies[i].setPreviousPosition(enemyManager.enemies[i].position);
 		//setPreviousPosition(enemies[i].pointer, enemies[i].position);
-		mapData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIDTH)] = ground;
+		levelData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIDTH)].character = ground;
 	}
 
 	/*
@@ -530,7 +497,7 @@ void ai()
 				 }
 			 }
 			 else if (distance >= 1 && distance < 15) {
-				 gameState = BATTLE;
+				 gameManager.gameState = gameManager.BATTLE;
 				 enemyManager.enemies[i].isTargetingPlayer = true;
 				 //messageBox.Add(Message("Battle start.", 14));
 				 if (enemyManager.enemies[i].position.x == playerPos.x) {
@@ -592,6 +559,7 @@ void ai()
 
 
 
+
 }
 
 void physics() {
@@ -632,7 +600,7 @@ void physics() {
 		//If the new position is on a wall send the enemy back a space
 		//Implement walls as a object and refer to those positions rather then map data
 		int pos = enemyManager.enemies[i].position.x + WIDTH * enemyManager.enemies[i].position.y;
-		if (mapData[pos] == wall) 
+		if (levelData[pos].character == wall) 
 		{
 			enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
 		}
@@ -640,11 +608,11 @@ void physics() {
 
 	int playerPos = playerManager.player.position.x + WIDTH * playerManager.player.position.y;
 
-	if (mapData[playerPos] == wall) 
+	if (levelData[playerPos].character == wall) 
 	{
 		playerManager.player.setPosition(playerManager.player.positionPrevious);
 	}
-	if (mapData[playerPos] == 'p') 
+	if (levelData[playerPos].character == 'p') 
 	{
 		bool isTrue = playerManager.addPotion(1);
 		if (!isTrue) 
@@ -652,7 +620,7 @@ void physics() {
 			playerManager.player.setPosition(playerManager.player.positionPrevious);
 		}
 	}
-	if (mapData[playerPos] == '>')
+	if (levelData[playerPos].character == '>')
 	{
 		++level;
 		importMapFromFile("level" + std::to_string(level));
@@ -675,7 +643,8 @@ void importMapFromFile(std::string fileName)
 	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
 
 	{
-		mapData[i] = ground;
+		levelData[i].character = ground;
+		levelData[i].color = 15;
 	}
 
 	std::ifstream input;
@@ -690,7 +659,7 @@ void importMapFromFile(std::string fileName)
 		{
 			for (int x = 0; x < WIDTH; ++x) 
 			{
-				mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)] = inputString.at(x);
+				levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)].character = inputString.at(x);
 			}
 
 			++y;
@@ -704,33 +673,47 @@ void importMapFromFile(std::string fileName)
 	S - add a enemy at that position
 	*/
 
-	NPC slime('S', 15, "Slime", 20, 5, 80, 1);
-	NPC dragon('D', 15, "Dragon", 200, 10, 80, 5);
+	NPC slime('S', 11, "Blue Slime", 20, 10, 80, 1);
+	NPC greenSlime('S', 10, "Green Slime", 20, 5, 80, 1);
+	NPC dragon('D', 12, "Dragon", 300, 10, 80, 5);
 
-	slime.exp = 10;
+	slime.exp = 30;
+	greenSlime.exp = 15;
 	dragon.exp = 100;
 
 	for (int y = 0; y < MAPHEIGHT; ++y) 
 	{
 		for (int x = 0; x < WIDTH; ++x) 
 		{
-			switch (mapData[x + WIDTH * y])
+			switch (levelData[x + WIDTH * y].character)
 			{
 			case '@':
 				playerManager.player.position = { x,y };
 				break;
 			case 'S':
 				//messageBox.Add(Message("Add enemy"));
-				enemyManager.addEnemy(slime, { x,y });
+				if (x > 40) 
+				{
+					enemyManager.addEnemy(greenSlime, { x,y });
+				}
+				else 
+				{
+					enemyManager.addEnemy(slime, { x,y });
+				}
+
 				break;
 			case 'D':
 				enemyManager.addEnemy(dragon, { x,y });
 				break;
 			case 'w':
-				mapData[x + WIDTH * y] = wall;
+				levelData[x + WIDTH * y].character = wall;
+				levelData[x + WIDTH * y].color = 6;
 				break;
 			case '.':
-				mapData[x + WIDTH * y] = ' ';
+				levelData[x + WIDTH * y].character = ground;
+			case 'p':
+				levelData[x + WIDTH * y].color = 13;
+				break;
 			default:
 				break;
 			}
@@ -750,7 +733,7 @@ void outputMapFromMem(std::string fileName)
 
 	for (int y = 0; y < MAPHEIGHT; ++y) {
 		for (int x = 0; x < WIDTH; ++x) {
-			outputCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+			outputCharA[x] = levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)].character;
 		}
 		output << outputCharA << "\n";
 	}

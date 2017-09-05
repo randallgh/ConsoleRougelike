@@ -3,6 +3,8 @@
 #include "Vector2D.h"
 #include "MessageBoxUI.h"
 #include "PlayerManager.h"
+#include "GameManager.h"
+#include "GameObject.h"
 
 class EnemyManager
 {
@@ -30,8 +32,9 @@ public:
 	NPC *currentEnemy;
 	MessageBoxUI * messageBox;
 	PlayerManager * playerManager;
+	GameManager * gameManager;
 
-	EnemyManager(char map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager);
+	EnemyManager(GameObject map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager, GameManager * gameManager);
 	~EnemyManager();
 };
 
