@@ -6,11 +6,12 @@
 //}
 
 
-EnemyManager::EnemyManager(char map[], int width)
+EnemyManager::EnemyManager(char map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager)
 {
 	this->map = map;
 	this->width = width;
-
+	this->messageBox = messageBox;
+	this->playerManager = playerManager;
 
 	for (int i = 0; i < MAXENEMIES; ++i) 
 	{
@@ -29,6 +30,35 @@ bool EnemyManager::areAllDead()
 	}
 
 	return true;
+}
+
+void EnemyManager::damageCurrentEnemy(int damage)
+{
+	currentEnemy->health -= damage;
+
+	messageBox->Add(Message("Did " + std::to_string(damage) + " damage to " + currentEnemy->name));
+
+
+	if (currentEnemy->health <= 0)
+	{
+		currentEnemy->isAlive = false;
+		//Remove enemy body here
+
+		messageBox->Add(Message("The " + currentEnemy->name + " was defeated!"));
+		playerManager->addPotion(1);
+		playerManager->addExp(10);
+		playerManager->printPotions();
+
+		if (areAllDead())
+		{
+			//gameState = OVERWORLD;
+			messageBox->Add(Message("All enemies defeated."));
+		}
+	}
+	else
+	{
+		messageBox->Add(Message(currentEnemy->name + " HP: " + std::to_string(currentEnemy->health)));
+	}
 }
 
 EnemyManager::~EnemyManager()

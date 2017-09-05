@@ -1,15 +1,19 @@
-﻿  Main.cpp
+﻿  PlayerManager.cpp
 e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\npc.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(42): warning C4309: 'initializing': truncation of constant value
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(107): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(470): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(793): warning C4309: '=': truncation of constant value
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(799): warning C4309: '=': truncation of constant value
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(802): warning C4309: '=': truncation of constant value
-e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(482): warning C4715: 'input': not all control paths return a value
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\playermanager.cpp(67): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+  EnemyManager.cpp
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\npc.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\messageboxui.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelikev2\infobox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  NPC.cpp
+  Main.cpp
   RougelikeV2.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)

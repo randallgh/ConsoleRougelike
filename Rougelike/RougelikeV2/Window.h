@@ -24,3 +24,28 @@ SMALL_RECT consoleWriteArea = { 0, 0, WIDTH - 1, HEIGHT - 1 };
 
 /* A CHAR_INFO structure containing data about a single character */
 CHAR_INFO consoleBuffer[WIDTH * HEIGHT];
+
+void initWindow() 
+{
+	/* initialize handles */
+	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
+	rHnd = GetStdHandle(STD_INPUT_HANDLE);
+
+	/* Set the console's title */
+	SetConsoleTitle("Rougelike");
+
+	/* Set the window size */
+	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
+
+	/* Set the screen's buffer size */
+	SetConsoleScreenBufferSize(wHnd, bufferSize);
+
+	/*---Turn off Cursor---*/
+
+	CONSOLE_CURSOR_INFO cursorInfo;
+
+	GetConsoleCursorInfo(wHnd, &cursorInfo);
+	cursorInfo.bVisible = false;
+	cursorInfo.dwSize = 1;
+	SetConsoleCursorInfo(wHnd, &cursorInfo);
+}

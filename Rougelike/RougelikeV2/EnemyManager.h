@@ -1,6 +1,8 @@
 #pragma once
 #include "NPC.h"
 #include "Vector2D.h"
+#include "MessageBoxUI.h"
+#include "PlayerManager.h"
 
 class EnemyManager
 {
@@ -20,10 +22,16 @@ public:
 	void printEnemies();
 	bool areAllDead();
 
+	void damageCurrentEnemy(int damage);
+
 	void * map;
 	int width;
 
-	EnemyManager(char map[], int width);
+	NPC *currentEnemy;
+	MessageBoxUI * messageBox;
+	PlayerManager * playerManager;
+
+	EnemyManager(char map[], int width, MessageBoxUI * messageBox, PlayerManager * playerManager);
 	~EnemyManager();
 };
 

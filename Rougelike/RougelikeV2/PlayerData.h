@@ -13,6 +13,7 @@ struct PlayerData
 	int gold = 100;
 
 	int exp = 0;
+	int expToNextLevel = 10;
 
 	int potions = 3;
 	int maxPotions = 3;

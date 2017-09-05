@@ -63,17 +63,17 @@ InfoBox infoBox({ 51,0 });
 
 #define MESSAGELENGTH 50
 /*-----Player-----*/
-PlayerManager playerM(uiData, WIDTH, &infoBox);
+PlayerManager playerM(uiData, WIDTH, &infoBox, &messageBox);
 //Player player;
 
 /*-----Enemies-----*/
-EnemyManager enemyManager(mapData,WIDTH);
+EnemyManager enemyManager(mapData,WIDTH,&messageBox,&playerM);
 
 //Enemy enemies[ENEMIESLENGTH];
 //Enemy slime = {20, 5, 'S', "Slime", true};
 
 /*----Battle----*/
-NPC *currentEnemy;
+
 
 /*---------------------------------------------------------------------*/
 
@@ -86,56 +86,20 @@ void physics();
 //Random
 bool didProc(int prob);
 
-void damageEnemy(int damage);
-
 //UI
-void UIrenderCharA(char a[], int length, Vector2D pos);
 void printUI();
 
 //Map
-//void defaultMapToFile();
 void outputMapFromMem(std::string fileName);
 void importMapFromFile(std::string fileName);
-
-
-void EnemyDied();
 
 
 int main()
 {
 
 	srand(time(0));
+	initWindow();
 
-	/* initialize handles */
-	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
-	rHnd = GetStdHandle(STD_INPUT_HANDLE);
-
-	/* Set the console's title */
-	SetConsoleTitle("Rougelike");
-
-	/* Set the window size */
-	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
-
-	/* Set the screen's buffer size */
-	SetConsoleScreenBufferSize(wHnd, bufferSize);
-
-	/*---Turn off Cursor---*/
-	
-	CONSOLE_CURSOR_INFO cursorInfo;
-
-	GetConsoleCursorInfo(wHnd, &cursorInfo);
-	cursorInfo.bVisible = false;
-	cursorInfo.dwSize = 1;
-	SetConsoleCursorInfo(wHnd, &cursorInfo);
-
-	/*-----------Map Generation----------*/
-
-	/*for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
-	{
-		mapData[i] = ground;
-	}*/
-
-	//UI Generation
 	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
 	{
 		uiData[i] = ' ';
@@ -145,27 +109,10 @@ int main()
 
 	importMapFromFile("home.txt");
 
-	//Add enemies to map
-	
-
-	//enemyManager.addEnemy(slime, { 10, 20 });
-	//enemyManager.addEnemy(slime, { 20, 20 });
-
-	//Add player to pos
-	//playerM.player.position = { 0, 0 };
-	//mapData[player.position.x * player.position.y] = player.character;
-
 	playerM.printHealth();
 	playerM.printPotions();
 	playerM.printLevel();
-
-	//enemyManager.printEnemies();
-
-	//TODO add to player manager
-	//mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
-
-	//outputMapFromMem("map.txt");
-	//defaultMapToFile();
+	playerM.printExp();
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -173,44 +120,28 @@ int main()
 		switch (gameState)
 		{
 		case OVERWORLD:
-			//Playermovement
 			input();
 			mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
-
-			//Move player
-
-			//Move enemies
 			ai();
 			physics();
-
-
-			//Check for collison
-			//If the positons of both the enemy and player are the same COLLIDE and start battle
-
 			break;
 
 		case BATTLE:
-
 			if (input()) {
 				mapData[vectorToFlatArray(playerM.player.positionPrevious, WIDTH)] = ground;
 				ai();
 				physics();
 			}
-
 			break;
 		default:
 			break;
 		}
-
-
-		//Render
+		//Add enemies and player to map
 		enemyManager.printEnemies();
-
 		mapData[playerM.player.position.x + WIDTH * playerM.player.position.y] = playerM.player.character;
-
 		render();
 
-		Sleep(100);
+		Sleep(90);
 	}
 }
 
@@ -220,8 +151,8 @@ void render()
 	messageBox.Clear(uiData, WIDTH, 50);
 	messageBox.Print(uiData, WIDTH, 50);
 
-	char tempChar;
-	WORD tempColor;
+	char tempChar = 0;
+	WORD tempColor = 0;
 	int y, x;
 	for (y = 0; y < HEIGHT; ++y) 
 	{
@@ -400,7 +331,8 @@ bool input() {
 	//Button to press to recover health: R key
 	//Calls a function to heal
 	//Removes a potion from the player
-	if (GetAsyncKeyState(0x52)) {
+	if (GetAsyncKeyState(0x52)) //R key
+	{
 
 		if (playerM.player.health < playerM.player.maxHealth) 
 		{
@@ -441,37 +373,37 @@ bool input() {
 
 		for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) 
 		{
-			if (currentEnemy == nullptr) 
+			if (enemyManager.currentEnemy == nullptr) 
 			{
-				currentEnemy = &enemyManager.enemies[i];
+				enemyManager.currentEnemy = &enemyManager.enemies[i];
 			}
 
 			NPC * element = &enemyManager.enemies[i];
 			if (element->isTargetingPlayer && element->isAlive)
 			{
 				if (distanceVector2D(element->position, playerM.player.position)
-					< distanceVector2D(currentEnemy->position, playerM.player.position)){
-					currentEnemy = element;
+					< distanceVector2D(enemyManager.currentEnemy->position, playerM.player.position)){
+					enemyManager.currentEnemy = element;
 				}
 
-				if (!currentEnemy->isAlive)
+				if (!enemyManager.currentEnemy->isAlive)
 				{
-					currentEnemy = element;
+					enemyManager.currentEnemy = element;
 				}
 			}
 		}
 
 		//Button to melee attack
-		if (GetAsyncKeyState(0x45)) 
+		if (GetAsyncKeyState(0x45)) //E key
 		{
 			//Attack current enemy
-			if ((*currentEnemy).isAlive)
+			if ((*enemyManager.currentEnemy).isAlive)
 			{
-				int distance = distanceVector2D((*playerPos), (*currentEnemy).position);
+				int distance = distanceVector2D((*playerPos), (*enemyManager.currentEnemy).position);
 				if (distance <= 2)
 				{
-					messageBox.Add(Message("Damage enemy."));
-					damageEnemy(playerM.player.attack);
+					//messageBox.Add(Message("Damage enemy."));
+					enemyManager.damageCurrentEnemy(playerM.player.attack);
 				}
 			}
 			return true;
@@ -591,7 +523,9 @@ void physics() {
 	//Enemy Collison
 	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i) {
 		
-		if (isSameVectors(playerM.player.position, enemyManager.enemies[i].position)) {
+		if (isSameVectors(playerM.player.position, enemyManager.enemies[i].position)
+			&& enemyManager.enemies[i].isAlive) 
+		{
 
 			//player.character = 'K';
 			//enemies[i].character = 'O';
@@ -631,80 +565,6 @@ void physics() {
 	//If the player is on a wall send them back
 }
 
-void UIrenderCharA(char a[], int length, Vector2D pos) 
-{
-	for (int i = 0; i < length; ++i)
-	{
-		uiData[pos.x + WIDTH * pos.y + i] = a[i];
-	}
-}
-
-void damageEnemy(int damage) 
-{
-	currentEnemy->health -= damage;
-
-	messageBox.Add(Message("Did " + std::to_string(damage) + " damage to " + currentEnemy->name));
-	messageBox.Add(Message("Remaining HP: " + std::to_string(currentEnemy->health)));
-
-	if (currentEnemy->health <= 0)
-	{
-		currentEnemy->isAlive = false;
-		//Remove enemy body here
-
-		EnemyDied();
-		messageBox.Add(Message("Enemy Dead!"));
-
-		if (enemyManager.areAllDead()) 
-		{
-			gameState = OVERWORLD;
-			messageBox.Add(Message("All enemies defeated."));
-		}
-	}
-}
-
-void EnemyDied()
-{
-	//Add function for adding potions
-	//Add Item class
-	++playerM.data.potions;
-	playerM.data.exp += 10;
-	messageBox.Add(Message("The enemy was defeated!"));
-
-	if (playerM.data.exp >= 10) 
-	{
-		++playerM.player.level;
-		messageBox.Add(Message("Level up!"));
-		playerM.printLevel();
-	}
-
-	playerM.printPotions();
-}
-
-//void defaultMapToFile() 
-//{
-//	/*--------------------------Output default map---------------------------*/
-//	std::string outputMapS;
-//	std::ofstream outputMap;
-//	char outputMapCharA[WIDTH * MAPHEIGHT] = { ' ' };
-//
-//	outputMap.open("defaultMap.txt");
-//
-//	//Get a string of data
-//	for (int y = 0; y < MAPHEIGHT; ++y) {
-//		for (int x = 0; x < WIDTH; ++x) {
-//			outputMapCharA[x] = mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
-//		}
-//		outputMap << outputMapCharA << "\n";
-//	}
-//
-//	outputMap.close();
-//
-//	//Add it to the file
-//
-//
-//	/*-------------------------------------------------------------------------*/
-//}
-
 void importMapFromFile(std::string fileName) 
 {
 	std::ifstream input;
@@ -717,9 +577,6 @@ void importMapFromFile(std::string fileName)
 		int y = 0;
 		while (getline(input, inputString)) 
 		{
-			//Take a line
-			//Add the line to a
-			messageBox.Add(Message("Added line"));
 			for (int x = 0; x < WIDTH; ++x) 
 			{
 				mapData[x + WIDTH * ((MAPHEIGHT - 1) - y)] = inputString.at(x);
