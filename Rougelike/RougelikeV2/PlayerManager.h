@@ -19,6 +19,7 @@ public:
 	void printPotions();
 	void printExp();
 	void printPotionPower();
+	void printArrows();
 
 	//Player data
 	NPC player;

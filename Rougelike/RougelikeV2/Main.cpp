@@ -112,16 +112,18 @@ int main()
 
 	importMapFromFile(currentMap);
 	//importMapFromFile("maps/map.txt");
+	playerManager.data.arrows = 10;
 
 	playerManager.printHealth();
 	playerManager.printPotions();
 	playerManager.printLevel();
 	playerManager.printExp();
 	playerManager.printPotionPower();
+	playerManager.printArrows();
 
 	messageBox.Add(Message("Welcome to Rougelike!"));
 	messageBox.Add(Message("Use the arrow keys to move."));
-	messageBox.Add(Message("E to attack. R to restore health."));
+	messageBox.Add(Message("E to attack. R to use bow. H to restore health."));
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -217,8 +219,8 @@ bool input() {
 	Vector2D *playerPos = &playerManager.player.position;
 	playerManager.player.setPreviousPosition((*playerPos));
 
-	//R Key
-	if (GetAsyncKeyState(0x52))
+	//H Key
+	if (GetAsyncKeyState(0x48))
 	{
 
 		if (playerManager.player.health < playerManager.player.maxHealth)
@@ -270,7 +272,8 @@ bool input() {
 			}
 		}
 
-		//E key Melee
+		//E key - Melee
+
 		if (GetAsyncKeyState(0x45))
 		{
 			//Attack current enemy
@@ -292,6 +295,35 @@ bool input() {
 				}
 			}
 			return true;
+		}
+
+		//R key - Ranged
+
+		if (GetAsyncKeyState(0x52)) 
+		{
+			if ((*enemyManager.currentEnemy).isAlive)
+			{
+				int distance = distanceVector2D((*playerPos), (*enemyManager.currentEnemy).position);
+				if (playerManager.data.arrows <= 0) 
+				{
+					messageBox.Add(Message("No arrows left!"));
+				}
+				else if (distance <= 10)
+				{
+					if (didProc(playerManager.player.dexterity))
+					{
+						messageBox.Add(Message("Player shot bow."));
+						enemyManager.damageCurrentEnemy(playerManager.player.attack);
+					}
+					else
+					{
+						messageBox.Add(Message("Missed ranged attack!"));
+					}
+					--playerManager.data.arrows;
+					playerManager.printArrows();
+					return true;
+				}
+			}
 		}
 	}
 

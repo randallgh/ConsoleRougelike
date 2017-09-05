@@ -17,6 +17,9 @@ struct PlayerData
 
 	int potions = 3;
 	int maxPotions = 3;
+
+	int arrows = 10;
+	int maxArrows = 10;
 	
 	int potionPower = 30;
 };

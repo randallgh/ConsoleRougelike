@@ -40,7 +40,11 @@ void EnemyManager::damageCurrentEnemy(int damage)
 
 	if (currentEnemy->health <= 0)
 	{
+		currentEnemy->character = ' ';
+		printEnemies();
+
 		currentEnemy->isAlive = false;
+
 		//Remove enemy body here
 
 		messageBox->Add(Message("The " + currentEnemy->name + " was defeated!"));

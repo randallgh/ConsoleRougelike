@@ -16,6 +16,7 @@ void PlayerManager::printLevel()
 	infoBox->AddInfo(static_cast<char*>(ui), width, 1, level);
 }
 
+
 void PlayerManager::printPotions()
 {
 	std::string potion = "Potions: " + std::to_string(this->data.potions) + "/" + std::to_string(this->data.maxPotions);
@@ -26,6 +27,12 @@ void PlayerManager::printPotionPower()
 {
 	std::string power = "Potion Power: " + std::to_string(this->data.potionPower);
 	infoBox->AddInfo(static_cast<char*>(ui), width, 5, power);
+}
+
+void PlayerManager::printArrows()
+{
+	std::string arrow = "Arrows: " + std::to_string(this->data.arrows) + "/" + std::to_string(this->data.maxArrows);
+	infoBox->AddInfo(static_cast<char*>(ui), width, 3, arrow);
 }
 
 void PlayerManager::printExp()
