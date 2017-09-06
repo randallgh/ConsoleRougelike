@@ -1,11 +1,8 @@
 ﻿  point2D.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\player.h(14): error C3646: 'position': unknown override specifier
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\player.h(14): error C4430: missing type specifier - int assumed. Note: C++ does not support default-int
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelike\map.h(18): error C2061: syntax error: identifier 'Player'
   main.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\map.h(21): error C2061: syntax error: identifier 'Player'
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\main.cpp(108): error C2660: 'generateBlankFlatMap': function does not take 2 arguments
-  Window.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\window.cpp(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelike\map.h(18): error C2061: syntax error: identifier 'Player'
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelike\main.cpp(108): error C2660: 'generateBlankFlatMap': function does not take 2 arguments
   Map.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelike\map.h(21): error C2061: syntax error: identifier 'Player'
+e:\randall\my documents\repos\consolerougelike\rougelike\rougelike\map.h(18): error C2061: syntax error: identifier 'Player'
   Generating Code...
