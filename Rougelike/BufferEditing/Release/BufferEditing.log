@@ -2,7 +2,7 @@
 Main.cpp(89): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 Main.cpp(132): warning C4018: '<': signed/unsigned mismatch
   Generating code
-  All 149 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  All 141 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
   Finished generating code
-  BufferEditing.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Release\BufferEditing.exe
-  BufferEditing.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Release\BufferEditing.pdb (Full PDB)
+  BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\BufferEditing.exe
+  BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\BufferEditing.pdb (Full PDB)

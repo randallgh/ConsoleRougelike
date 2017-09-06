@@ -4,7 +4,6 @@ http://cecilsunkure.blogspot.com/2011/11/windows-console-game-event-handling.htm
 https://github.com/axthomas-aie/CppSideProjects-AIE
 */
 
-
 #include <windows.h> /* for HANDLE type, and console functions */
 #include <stdio.h> /* standard input/output */
 #include <stdlib.h> /* included for rand */
