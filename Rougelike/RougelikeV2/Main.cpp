@@ -35,7 +35,7 @@ char ground = ' ';//249;
 char wall = 178;
 
 int level = 1;
-std::string currentMap = "test";
+std::string currentMap = "level1";
 
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];

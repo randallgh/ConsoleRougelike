@@ -1,5 +1,5 @@
 ﻿  Main.cpp
-c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(87): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(130): warning C4018: '<': signed/unsigned mismatch
+c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(88): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(131): warning C4018: '<': signed/unsigned mismatch
   BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.exe
   BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.pdb (Partial PDB)

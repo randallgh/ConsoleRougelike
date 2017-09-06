@@ -16,6 +16,7 @@ https://github.com/axthomas-aie/CppSideProjects-AIE
 #define HEIGHT 40
 
 char map[WIDTH * HEIGHT];
+char current = 'w';
 
 HANDLE wHnd; /* write (output) handle */
 HANDLE rHnd; /* read (input handle */
@@ -131,6 +132,47 @@ int main(void)
 		{
 			switch (eventBuffer[i].EventType)
 			{
+			case KEY_EVENT:
+
+				if (eventBuffer[i].Event.KeyEvent.bKeyDown)
+				{
+					switch (eventBuffer[i].Event.KeyEvent.wVirtualKeyCode)
+					{
+					case VK_NUMPAD0:
+						for (y = 0; y < HEIGHT; ++y)
+						{
+							for (x = 0; x < WIDTH; ++x)
+							{
+								//consoleBuffer[x + WIDTH * y].Char.AsciiChar = '.';
+								map[x + WIDTH * y] = '.';
+							}
+						}
+						break;
+					case VK_NUMPAD1:
+						current = 'w';
+						break;
+					case VK_NUMPAD2:
+						current = '@';
+						break;
+					case VK_NUMPAD3:
+						break;
+					case VK_NUMPAD4:
+						break;
+					case VK_NUMPAD5:
+						break;
+					case VK_NUMPAD6:
+						break;
+					case VK_NUMPAD7:
+						break;
+					case VK_NUMPAD8:
+						break;
+					case VK_NUMPAD9:
+						break;
+					case VK_RETURN:
+						outputMapFromMem("test.txt");
+						break;
+					}
+				}
 			case MOUSE_EVENT:
 				if (eventBuffer[i].Event.MouseEvent.dwButtonState == 0x0001)
 				{
@@ -154,7 +196,7 @@ int main(void)
 
 		if (lclick) 
 		{
-			map[mouse.x + WIDTH * mouse.y] = 'w';
+			map[mouse.x + WIDTH * mouse.y] = current;
 			lclick = false;
 		}
 
@@ -162,11 +204,6 @@ int main(void)
 		{
 			map[mouse.x + WIDTH * mouse.y] = '.';
 			rclick = false;
-		}
-
-		if (VK_RETURN) 
-		{
-			outputMapFromMem("test.txt");
 		}
 
 		char tempChar;
@@ -184,7 +221,7 @@ int main(void)
 		consoleBuffer[(lastPos.x + WIDTH * ((HEIGHT - 1) - lastPos.y))].Char.AsciiChar = '.';
 		consoleBuffer[(lastPos.x + WIDTH * ((HEIGHT - 1) - lastPos.y))].Attributes = 15;
 		//set current
-		consoleBuffer[(mouse.x + WIDTH * ((HEIGHT - 1) - mouse.y))].Char.AsciiChar = 'w';
+		consoleBuffer[(mouse.x + WIDTH * ((HEIGHT - 1) - mouse.y))].Char.AsciiChar = current;
 		consoleBuffer[(mouse.x + WIDTH * ((HEIGHT - 1) - mouse.y))].Attributes = 15;
 		lastPos = { mouse.x, mouse.y };
 

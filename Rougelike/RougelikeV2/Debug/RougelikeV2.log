@@ -14,5 +14,6 @@ c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(756): warning C4309: '=': truncation of constant value
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(759): warning C4309: '=': truncation of constant value
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(450): warning C4715: 'input': not all control paths return a value
+cl : Command line warning D9028: minimal rebuild failure, reverting to normal build
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\RougelikeV2.pdb (Partial PDB)
