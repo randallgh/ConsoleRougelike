@@ -78,6 +78,14 @@ void printUI();
 void outputMapFromMem(std::string fileName);
 void importMapFromFile(std::string fileName);
 
+void help() 
+{
+	messageBox.Add(Message("Welcome to Rougelike!"));
+	messageBox.Add(Message("Use the arrow keys to move."));
+	messageBox.Add(Message("E to attack. R to use bow. H to restore health."));
+	messageBox.Add(Message("Head to the > to challange the dragon."));
+	messageBox.Add(Message("Press the I key to see this imformation again."));
+}
 
 int main()
 {
@@ -112,10 +120,7 @@ int main()
 	playerManager.printPotionPower();
 	playerManager.printArrows();
 
-	messageBox.Add(Message("Welcome to Rougelike!"));
-	messageBox.Add(Message("Use the arrow keys to move."));
-	messageBox.Add(Message("E to attack. R to use bow. H to restore health."));
-	messageBox.Add(Message("Head to the > to challange the dragon."));
+	help();
 
 	/*---------------------------Game Loop--------------------------*/
 	while (isRunning) {
@@ -427,6 +432,11 @@ bool input() {
 	//Button to press to recover health: R key
 	//Calls a function to heal
 	//Removes a potion from the player
+
+	//I for info
+	if (GetAsyncKeyState(0x49)) {
+		help();
+	}
 
 	//Debug Key Period
 	if (GetAsyncKeyState(VK_OEM_PERIOD)) {
