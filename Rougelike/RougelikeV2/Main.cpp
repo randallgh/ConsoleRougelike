@@ -35,7 +35,7 @@ char ground = ' ';//249;
 char wall = 178;
 
 int level = 1;
-std::string currentMap = "level1";
+std::string currentMap = "test";
 
 /*-----UI-----*/
 char uiData[WIDTH * UIHEIGHT];
@@ -428,10 +428,10 @@ bool input() {
 	//Calls a function to heal
 	//Removes a potion from the player
 
-	////Debug Key Period
-	//if (GetAsyncKeyState(VK_OEM_PERIOD)) {
-	//	importMapFromFile("maps/level1.txt");
-	//}
+	//Debug Key Period
+	if (GetAsyncKeyState(VK_OEM_PERIOD)) {
+		importMapFromFile("test");
+	}
 
 	//if (GetAsyncKeyState(VK_OEM_COMMA)) {
 	//	importMapFromFile("maps/level2.txt");
