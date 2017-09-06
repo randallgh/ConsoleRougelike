@@ -29,7 +29,7 @@ bool isRunning = true;
 
 /*-----Map-----*/
 //char mapData[WIDTH * MAPHEIGHT];
-GameObject levelData[WIDTH * MAPHEIGHT];
+GameObject levelData[WIN_WIDTH * MAP_HEIGHT];
 
 char ground = ' ';//249;
 char wall = 178;
@@ -38,7 +38,7 @@ int level = 1;
 std::string currentMap = "level1";
 
 /*-----UI-----*/
-char uiData[WIDTH * UIHEIGHT];
+char uiData[WIN_WIDTH * UI_HEIGHT];
 
 Vector2D playerHealthUIStart = { 59, 8 };
 
@@ -54,11 +54,11 @@ InfoBox infoBox({ 51,0 });
 
 GameManager gameManager;
 /*-----Player-----*/
-PlayerManager playerManager(uiData, WIDTH, &infoBox, &messageBox);
+PlayerManager playerManager(uiData, WIN_WIDTH, &infoBox, &messageBox);
 //Player player;
 
 /*-----Enemies-----*/
-EnemyManager enemyManager(levelData,WIDTH,&messageBox,&playerManager,&gameManager);
+EnemyManager enemyManager(levelData,WIN_WIDTH,&messageBox,&playerManager,&gameManager);
 
 /*---------------------------------------------------------------------*/
 
@@ -94,15 +94,15 @@ int main()
 	initWindow();
 
 
-	for (int i = 0; i < UIHEIGHT * WIDTH; ++i) 
+	for (int i = 0; i < UI_HEIGHT * WIN_WIDTH; ++i) 
 	{
 		uiData[i] = ' ';
 	}
 
-	for (int y = 0; y < MAPHEIGHT; ++y)
+	for (int y = 0; y < MAP_HEIGHT; ++y)
 	{
-		for (int x = 0; x < WIDTH; ++x) {
-			levelData[x + WIDTH * y].position = { x,y };
+		for (int x = 0; x < WIN_WIDTH; ++x) {
+			levelData[x + WIN_WIDTH * y].position = { x,y };
 		}
 	}
 
@@ -129,14 +129,14 @@ int main()
 		{
 		case gameManager.OVERWORLD:
 			input();
-			levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)].character = ground;
+			levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIN_WIDTH)].character = ground;
 			ai();
 			physics();
 			break;
 
 		case gameManager.BATTLE:
 			if (input()) {
-				levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIDTH)].character = ground;
+				levelData[vectorToFlatArray(playerManager.player.positionPrevious, WIN_WIDTH)].character = ground;
 				ai();
 				physics();
 			}
@@ -151,8 +151,8 @@ int main()
 		}
 		//Add enemies and player to map
 		enemyManager.printEnemies();
-		levelData[playerManager.player.position.x + WIDTH * playerManager.player.position.y].character = playerManager.player.character;
-		levelData[playerManager.player.position.x + WIDTH * playerManager.player.position.y].color = playerManager.player.color;
+		levelData[playerManager.player.position.x + WIN_WIDTH * playerManager.player.position.y].character = playerManager.player.character;
+		levelData[playerManager.player.position.x + WIN_WIDTH * playerManager.player.position.y].color = playerManager.player.color;
 		render();
 
 		Sleep(100);
@@ -162,27 +162,27 @@ int main()
 //Takes whatever is in mapData and adds it to the console buffer
 void render()
 {
-	messageBox.Clear(uiData, WIDTH, 50);
-	messageBox.Print(uiData, WIDTH, 50);
+	messageBox.Clear(uiData, WIN_WIDTH, 50);
+	messageBox.Print(uiData, WIN_WIDTH, 50);
 
 	GameObject tempObject;
 
 	int y, x;
-	for (y = 0; y < HEIGHT; ++y) 
+	for (y = 0; y < WIN_HEIGHT; ++y) 
 	{
-		for (x = 0; x < WIDTH; ++x) 
+		for (x = 0; x < WIN_WIDTH; ++x) 
 		{
-			if ((x + WIDTH * ((MAPHEIGHT - 1) - y))  >= 0) {
+			if ((x + WIN_WIDTH * ((MAP_HEIGHT - 1) - y))  >= 0) {
 
-				tempObject = levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)];
+				tempObject = levelData[x + WIN_WIDTH * ((MAP_HEIGHT - 1) - y)];
 
-				consoleBuffer[x + WIDTH * y].Char.AsciiChar = tempObject.character;
-				consoleBuffer[x + WIDTH * y].Attributes = tempObject.color;
+				consoleBuffer[x + WIN_WIDTH * y].Char.AsciiChar = tempObject.character;
+				consoleBuffer[x + WIN_WIDTH * y].Attributes = tempObject.color;
 				
 			} 
-			if ((x + WIDTH  * y) >= MAPHEIGHT * WIDTH ) {
-				consoleBuffer[x + WIDTH * y].Char.AsciiChar = uiData[x + WIDTH * ((UIHEIGHT - 1) - (y - MAPHEIGHT))];
-				consoleBuffer[x + WIDTH * y].Attributes = 15 | FOREGROUND_INTENSITY;
+			if ((x + WIN_WIDTH  * y) >= MAP_HEIGHT * WIN_WIDTH ) {
+				consoleBuffer[x + WIN_WIDTH * y].Char.AsciiChar = uiData[x + WIN_WIDTH * ((UI_HEIGHT - 1) - (y - MAP_HEIGHT))];
+				consoleBuffer[x + WIN_WIDTH * y].Attributes = 15 | FOREGROUND_INTENSITY;
 			}
 		}
 	}
@@ -310,13 +310,13 @@ bool input() {
 		++(*playerPos).y;
 		++(*playerPos).x;
 
-		if ((*playerPos).y >= MAPHEIGHT) {
-			(*playerPos).y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAP_HEIGHT) {
+			(*playerPos).y = (MAP_HEIGHT - 1);
 
 		}
 
-		if ((*playerPos).x >= WIDTH) {
-			(*playerPos).x = (WIDTH - 1);
+		if ((*playerPos).x >= WIN_WIDTH) {
+			(*playerPos).x = (WIN_WIDTH - 1);
 		}
 		playerManager.player.hasMoved = true;
 		return true;
@@ -333,8 +333,8 @@ bool input() {
 			(*playerPos).y = 0;
 		}
 
-		if ((*playerPos).x >= WIDTH) {
-			(*playerPos).x = (WIDTH - 1);
+		if ((*playerPos).x >= WIN_WIDTH) {
+			(*playerPos).x = (WIN_WIDTH - 1);
 		}
 		playerManager.player.hasMoved = true;
 		return true;
@@ -363,8 +363,8 @@ bool input() {
 		++(*playerPos).y;
 		--(*playerPos).x;
 
-		if ((*playerPos).y >= MAPHEIGHT) {
-			(*playerPos).y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAP_HEIGHT) {
+			(*playerPos).y = (MAP_HEIGHT - 1);
 
 		}
 
@@ -380,8 +380,8 @@ bool input() {
 	{
 		(*playerPos).y++;
 
-		if ((*playerPos).y >= MAPHEIGHT) {
-			(*playerPos).y = (MAPHEIGHT - 1);
+		if ((*playerPos).y >= MAP_HEIGHT) {
+			(*playerPos).y = (MAP_HEIGHT - 1);
 		}
 		//Message move("playerM.player moved north.", 20);
 		//messageBox.Add(move);
@@ -406,8 +406,8 @@ bool input() {
 	{
 		(*playerPos).x++;
 
-		if ((*playerPos).x >= WIDTH) {
-			(*playerPos).x = (WIDTH - 1);
+		if ((*playerPos).x >= WIN_WIDTH) {
+			(*playerPos).x = (WIN_WIDTH - 1);
 		}
 		//Message move("Player moved east.", 19);
 		//messageBox.Add(move)
@@ -470,7 +470,7 @@ void ai()
 
 		enemyManager.enemies[i].setPreviousPosition(enemyManager.enemies[i].position);
 		//setPreviousPosition(enemies[i].pointer, enemies[i].position);
-		levelData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIDTH)].character = ground;
+		levelData[vectorToFlatArray(enemyManager.enemies[i].positionPrevious, WIN_WIDTH)].character = ground;
 	}
 
 	/*
@@ -654,14 +654,14 @@ void physics() {
 	{
 		//If the new position is on a wall send the enemy back a space
 		//Implement walls as a object and refer to those positions rather then map data
-		int pos = enemyManager.enemies[i].position.x + WIDTH * enemyManager.enemies[i].position.y;
+		int pos = enemyManager.enemies[i].position.x + WIN_WIDTH * enemyManager.enemies[i].position.y;
 		if (levelData[pos].character == wall) 
 		{
 			enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
 		}
 	}
 
-	int playerPos = playerManager.player.position.x + WIDTH * playerManager.player.position.y;
+	int playerPos = playerManager.player.position.x + WIN_WIDTH * playerManager.player.position.y;
 
 	if (levelData[playerPos].character == wall) 
 	{
@@ -703,7 +703,7 @@ void importMapFromFile(std::string fileName)
 		enemyManager.enemies[i].character = ' ';
 	}
 
-	for (int i = 0; i < MAPHEIGHT * WIDTH; ++i)
+	for (int i = 0; i < MAP_HEIGHT * WIN_WIDTH; ++i)
 
 	{
 		levelData[i].character = ground;
@@ -720,9 +720,10 @@ void importMapFromFile(std::string fileName)
 		int y = 0;
 		while (getline(input, inputString)) 
 		{
-			for (int x = 0; x < WIDTH; ++x) 
+			for (int x = 0; x < WIN_WIDTH; ++x) 
 			{
-				levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)].character = inputString.at(x);
+				inputString.resize(WIN_WIDTH);
+				levelData[x + WIN_WIDTH * ((MAP_HEIGHT - 1) - y)].character = inputString.at(x);
 			}
 
 			++y;
@@ -744,11 +745,11 @@ void importMapFromFile(std::string fileName)
 	greenSlime.exp = 15;
 	dragon.exp = 100;
 
-	for (int y = 0; y < MAPHEIGHT; ++y) 
+	for (int y = 0; y < MAP_HEIGHT; ++y) 
 	{
-		for (int x = 0; x < WIDTH; ++x) 
+		for (int x = 0; x < WIN_WIDTH; ++x) 
 		{
-			switch (levelData[x + WIDTH * y].character)
+			switch (levelData[x + WIN_WIDTH * y].character)
 			{
 			case '@':
 				playerManager.player.position = { x,y };
@@ -762,16 +763,16 @@ void importMapFromFile(std::string fileName)
 				enemyManager.addEnemy(dragon, { x,y });
 				break;
 			case 'w':
-				levelData[x + WIDTH * y].character = wall;
-				levelData[x + WIDTH * y].color = 6;
+				levelData[x + WIN_WIDTH * y].character = wall;
+				levelData[x + WIN_WIDTH * y].color = 6;
 				break;
 			case '.':
-				levelData[x + WIDTH * y].character = ground;
+				levelData[x + WIN_WIDTH * y].character = ground;
 			case 'p':
-				levelData[x + WIDTH * y].color = 13;
+				levelData[x + WIN_WIDTH * y].color = 13;
 				break;
 			case 'a':
-				levelData[x + WIDTH * y].color = 14;
+				levelData[x + WIN_WIDTH * y].color = 14;
 				break;
 			default:
 				break;
@@ -786,13 +787,13 @@ void outputMapFromMem(std::string fileName)
 {
 	std::string outputMapString;
 	std::ofstream output;
-	char outputCharA[WIDTH * MAPHEIGHT] = { ' ' };
+	char outputCharA[WIN_WIDTH * MAP_HEIGHT] = { ' ' };
 
 	output.open(fileName);
 
-	for (int y = 0; y < MAPHEIGHT; ++y) {
-		for (int x = 0; x < WIDTH; ++x) {
-			outputCharA[x] = levelData[x + WIDTH * ((MAPHEIGHT - 1) - y)].character;
+	for (int y = 0; y < MAP_HEIGHT; ++y) {
+		for (int x = 0; x < WIN_WIDTH; ++x) {
+			outputCharA[x] = levelData[x + WIN_WIDTH * ((MAP_HEIGHT - 1) - y)].character;
 		}
 		output << outputCharA << "\n";
 	}
@@ -803,24 +804,24 @@ void printUI()
 {
 	char healthUI[] = "Player: ";
 	//Need a line of characters at the top of the UI box
-	for (int y = 0; y < UIHEIGHT; ++y) {
-		for (int x = 0; x < WIDTH; ++x) {
+	for (int y = 0; y < UI_HEIGHT; ++y) {
+		for (int x = 0; x < WIN_WIDTH; ++x) {
 			if (y == 9) {
-				uiData[x + WIDTH * y] = 205;
+				uiData[x + WIN_WIDTH * y] = 205;
 			}
 			if ((x >= 0 && y >= 8) && (x <= 9 && y <= 8)) {
-				uiData[x + WIDTH * y] = x + 48;
+				uiData[x + WIN_WIDTH * y] = x + 48;
 			}
 			if (x == 50) {
-				uiData[x + WIDTH * y] = 186;
+				uiData[x + WIN_WIDTH * y] = 186;
 			}
 			if (x == 50 && y == 9) {
-				uiData[x + WIDTH * y] = 203;
+				uiData[x + WIN_WIDTH * y] = 203;
 			}
 			if (x == 51 && y == 8) {
 				for (int i = 0; i < 8; ++i)
 				{
-					uiData[x + WIDTH * y + i] = healthUI[i];
+					uiData[x + WIN_WIDTH * y + i] = healthUI[i];
 				}
 			}
 

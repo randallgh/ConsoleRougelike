@@ -12,17 +12,35 @@ https://github.com/axthomas-aie/CppSideProjects-AIE
 #include <string>
 #include <fstream>
 
-#define WIDTH 80
-#define HEIGHT 40
+#define WIDTH 200
+#define HEIGHT 80
+
+bool isRunning = true;
 
 char map[WIDTH * HEIGHT];
 char current = 'w';
+
+/* Window size coordinates, be sure to start index at zero! */
+SMALL_RECT windowSize = { 0, 0, WIDTH - 1, HEIGHT - 1 };
+
+/* A COORD struct for specificying the console's screen buffer dimensions */
+COORD bufferSize = { WIDTH, HEIGHT };
+
+/* Setting up different variables for passing to WriteConsoleOutput */
+COORD characterBufferSize = { WIDTH, HEIGHT };
+COORD characterPosition = { 0, 0 };
+SMALL_RECT consoleWriteArea = { 0, 0, WIDTH - 1, HEIGHT - 1 };
+
+/* A CHAR_INFO structure containing data about a single character */
+CHAR_INFO consoleBuffer[WIDTH * HEIGHT];
 
 HANDLE wHnd; /* write (output) handle */
 HANDLE rHnd; /* read (input handle */
 
 INPUT_RECORD* eventBuffer;
 DWORD numEventsRead;
+
+HWND console;
 
 struct vec2
 {
@@ -64,6 +82,7 @@ DWORD getInput(INPUT_RECORD **eventBuffer)
 	return numEventsRead;
 }
 
+//Kill me
 void outputMapFromMem(std::string fileName)
 {
 	std::string outputMapString;
@@ -87,32 +106,18 @@ int main(void)
 
 	srand(time(0));
 
-	/* Window size coordinates, be sure to start index at zero! */
-	SMALL_RECT windowSize = { 0, 0, WIDTH - 1, HEIGHT - 1 };
-
-	/* A COORD struct for specificying the console's screen buffer dimensions */
-	COORD bufferSize = { WIDTH, HEIGHT };
-
-	/* Setting up different variables for passing to WriteConsoleOutput */
-	COORD characterBufferSize = { WIDTH, HEIGHT };
-	COORD characterPosition = { 0, 0 };
-	SMALL_RECT consoleWriteArea = { 0, 0, WIDTH - 1, HEIGHT - 1 };
-
-	/* A CHAR_INFO structure containing data about a single character */
-	CHAR_INFO consoleBuffer[WIDTH * HEIGHT];
-
 	/* initialize handles */
 	wHnd = GetStdHandle(STD_OUTPUT_HANDLE);
 	rHnd = GetStdHandle(STD_INPUT_HANDLE);
 
 	/* Set the console's title */
-	SetConsoleTitle("Rougelike");
-
-	/* Set the window size */
-	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
+	SetConsoleTitle("Rougelike - Editor");
 
 	/* Set the screen's buffer size */
 	SetConsoleScreenBufferSize(wHnd, bufferSize);
+
+	/* Set the window size */
+	SetConsoleWindowInfo(wHnd, TRUE, &windowSize);
 
 	for (y = 0; y < HEIGHT; ++y)
 	{
@@ -124,7 +129,7 @@ int main(void)
 	}
 
 
-	while (true) {
+	while (isRunning) {
 
 		numEventsRead = getInput(&eventBuffer);
 
@@ -152,24 +157,32 @@ int main(void)
 						current = 'w';
 						break;
 					case VK_NUMPAD2:
-						current = '@';
+						current = 'p';
 						break;
 					case VK_NUMPAD3:
+						current = 'a';
 						break;
 					case VK_NUMPAD4:
+						current = 'S';
 						break;
 					case VK_NUMPAD5:
+						current = 'D';
 						break;
 					case VK_NUMPAD6:
+						current = '>';
 						break;
 					case VK_NUMPAD7:
 						break;
 					case VK_NUMPAD8:
 						break;
 					case VK_NUMPAD9:
+						current = '@';
 						break;
 					case VK_RETURN:
 						outputMapFromMem("test.txt");
+						break;
+					case VK_ESCAPE:
+						isRunning = false;
 						break;
 					}
 				}
@@ -216,7 +229,6 @@ int main(void)
 				consoleBuffer[x + WIDTH * y].Attributes = 15;
 			}
 		}
-
 		//set last pos
 		consoleBuffer[(lastPos.x + WIDTH * ((HEIGHT - 1) - lastPos.y))].Char.AsciiChar = '.';
 		consoleBuffer[(lastPos.x + WIDTH * ((HEIGHT - 1) - lastPos.y))].Attributes = 15;

@@ -1,2 +1,53 @@
-﻿  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\RougelikeV2.exe
-  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\RougelikeV2.pdb (Full PDB)
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(392,5): warning MSB8028: The intermediate directory (Release\) contains files shared from another project (RougelikeV2.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  EnemyManager.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\NPC.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\GameObject.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  GameManager.cpp
+  InfoBox.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  Input.cpp
+  Main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\NPC.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\GameObject.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+Main.cpp(35): warning C4309: 'initializing': truncation of constant value
+Main.cpp(93): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Main.cpp(259): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+Main.cpp(283): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+Main.cpp(809): warning C4309: '=': truncation of constant value
+Main.cpp(815): warning C4309: '=': truncation of constant value
+Main.cpp(818): warning C4309: '=': truncation of constant value
+  Message.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  MessageBoxUI.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  NPC.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\NPC.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  PlayerManager.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\NPC.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\InfoBox.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+PlayerManager.cpp(83): warning C4244: '*=': conversion from 'float' to 'int', possible loss of data
+  Vector2D.cpp
+Vector2D.cpp(6): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Generating code
+c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\main.cpp(465): warning C4715: 'input': not all control paths return a value
+  All 280 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Rougelike.exe
+  RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Rougelike.pdb (Full PDB)
