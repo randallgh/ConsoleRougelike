@@ -182,7 +182,7 @@ void render()
 		}
 	}
 
-	/* Write our character buffer (a single character currently) to the console buffer */
+	/* Write our character buffer to the console buffer */
 	WriteConsoleOutputA(wHnd, consoleBuffer, characterBufferSize, characterPosition, &consoleWriteArea);
 }
 
