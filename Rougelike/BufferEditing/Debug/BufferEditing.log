@@ -1,2 +1,5 @@
-﻿  BufferEditing.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.exe
-  BufferEditing.vcxproj -> E:\Randall\My Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.pdb (Partial PDB)
+﻿  Main.cpp
+c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(89): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(132): warning C4018: '<': signed/unsigned mismatch
+  BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.exe
+  BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\BufferEditing.pdb (Partial PDB)

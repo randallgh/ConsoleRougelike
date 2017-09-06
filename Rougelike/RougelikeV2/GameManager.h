@@ -6,7 +6,8 @@ public:
 	enum GameStates
 	{
 		OVERWORLD,
-		BATTLE
+		BATTLE,
+		DEAD
 	};
 
 	GameStates gameState = OVERWORLD;

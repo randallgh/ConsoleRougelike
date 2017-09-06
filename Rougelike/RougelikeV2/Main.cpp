@@ -141,6 +141,11 @@ int main()
 				physics();
 			}
 			break;
+		case gameManager.DEAD:
+			if (GetAsyncKeyState(VK_ESCAPE)) {
+				isRunning = false;
+			}
+			break;
 		default:
 			break;
 		}
@@ -500,6 +505,14 @@ void ai()
 
 					 playerManager.damage(damage);
 					 playerManager.printHealth();
+					 if (playerManager.player.health <= 0) 
+					 {
+						 playerManager.player.isAlive = false;
+						 gameManager.gameState = gameManager.DEAD;
+						 messageBox.Add(Message(" "));
+						 messageBox.Add(Message("You have died! Hit ESC to end the game."));
+						 messageBox.Add(Message("Relaunch to try again."));
+					 }
 				 } 
 				 else 
 				 {
@@ -600,6 +613,38 @@ void physics() {
 					playerManager.player.setPosition(playerManager.player.positionPrevious);
 				}
 			}
+
+			/*for (int e = 0; e < enemyManager.getMaxEnemies(); ++e) 
+			{
+				if (isSameVectors(enemyManager.enemies[i].position, enemyManager.enemies[e].position)
+					&& enemyManager.enemies[i].isAlive && enemyManager.enemies[e].isAlive)
+				{
+					messageBox.Add(Message("ENEMY ENEMY COLLISION");
+					if (enemyManager.enemies[i].hasMoved && enemyManager.enemies[e].hasMoved)
+					{
+						enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+					}
+					else
+					{
+						if (enemyManager.enemies[i].hasMoved)
+						{
+							enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+						}
+
+						if (enemyManager.enemies[e].hasMoved)
+						{
+							enemyManager.enemies[e].setPosition(enemyManager.enemies[e].positionPrevious);
+						}
+					}
+
+					if(!(&enemyManager.enemies[i] == &enemyManager.enemies[e]))
+					{
+					
+					}
+				}
+			}*/
+			//playerManager.damage(enemyManager.enemies[i].attack);
+			//enemyManager.damageCurrentEnemy(playerManager.player.attack);
 		}
 	}
 
@@ -626,6 +671,14 @@ void physics() {
 	{
 		bool isTrue = playerManager.addPotion(1);
 		if (!isTrue) 
+		{
+			playerManager.player.setPosition(playerManager.player.positionPrevious);
+		}
+	}
+	if (levelData[playerPos].character == 'a')
+	{
+		bool isTrue = playerManager.addArrow(10);
+		if (!isTrue)
 		{
 			playerManager.player.setPosition(playerManager.player.positionPrevious);
 		}
@@ -702,14 +755,7 @@ void importMapFromFile(std::string fileName)
 				break;
 			case 'S':
 				//messageBox.Add(Message("Add enemy"));
-				if (x > 40) 
-				{
-					enemyManager.addEnemy(greenSlime, { x,y });
-				}
-				else 
-				{
-					enemyManager.addEnemy(slime, { x,y });
-				}
+				enemyManager.addEnemy(slime, { x,y });
 
 				break;
 			case 'D':
@@ -723,6 +769,9 @@ void importMapFromFile(std::string fileName)
 				levelData[x + WIDTH * y].character = ground;
 			case 'p':
 				levelData[x + WIDTH * y].color = 13;
+				break;
+			case 'a':
+				levelData[x + WIDTH * y].color = 14;
 				break;
 			default:
 				break;

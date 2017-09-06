@@ -10,7 +10,7 @@ class EnemyManager
 {
 public:
 
-	#define MAXENEMIES 10
+	#define MAXENEMIES 30
 
 	//enemies char
 	NPC enemies[MAXENEMIES];

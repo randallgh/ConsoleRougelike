@@ -99,11 +99,29 @@ bool PlayerManager::addPotion(int num)
 
 	data.potions += num;
 	messageBox->Add(Message("Picked up potion."));
-	printPotions();
 	if (data.potions > data.maxPotions) 
 	{
 		data.potions = data.maxPotions;
 	}
+	printPotions();
+	return true;
+}
+
+bool PlayerManager::addArrow(int num)
+{
+	if (data.arrows >= data.maxArrows)
+	{
+		messageBox->Add(Message("You are full on arrows!"));
+		return false;
+	}
+
+	data.arrows += num;
+	messageBox->Add(Message("Picked up arrows."));
+	if (data.arrows > data.maxArrows)
+	{
+		data.arrows = data.maxArrows;
+	}
+	printArrows();
 	return true;
 }
 

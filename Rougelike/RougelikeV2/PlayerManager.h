@@ -29,6 +29,7 @@ public:
 	void heal(int health);
 	void addExp(int exp);
 	bool addPotion(int num);
+	bool addArrow(int num);
 
 	PlayerManager(char ui[], int width, InfoBox * infoBox, MessageBoxUI * messageBox);
 	~PlayerManager();
