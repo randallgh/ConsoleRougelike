@@ -1,4 +1,5 @@
 /*
+Used some code from these sources
 http://cecilsunkure.blogspot.com/2011/11/windows-console-game-event-handling.html
 https://github.com/axthomas-aie/CppSideProjects-AIE
 */
