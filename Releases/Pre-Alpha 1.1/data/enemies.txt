@@ -1,0 +1,31 @@
+@
+Blue Slime
+BLUE
+S
+20
+10
+80
+1
+30
+
+
+@
+Green Slime
+GREEN
+S
+30
+15
+80
+2
+40
+
+
+@
+Red Dragon
+RED
+D
+300
+10
+80
+5
+200

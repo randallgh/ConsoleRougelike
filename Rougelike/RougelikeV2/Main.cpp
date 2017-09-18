@@ -1036,7 +1036,7 @@ void loadEnemies()
 				getline(file, buffer);
 				exp = std::stoi(buffer);
 
-				messageBox.Add(Message("Loaded " + name + " C: " + c));
+				//messageBox.Add(Message("Loaded " + name + " C: " + c));
 				enemyManager.addDatabase(new NPC(c, color, name, health, attack, dexterity, level, exp));
 			}
 		}

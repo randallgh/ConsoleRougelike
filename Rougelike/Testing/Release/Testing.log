@@ -1,0 +1,7 @@
+﻿  main.cpp
+main.cpp(67): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+  Generating code
+  All 151 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Testing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Testing.exe
+  Testing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Testing.pdb (Full PDB)
