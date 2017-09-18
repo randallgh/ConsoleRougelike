@@ -12,8 +12,8 @@ https://github.com/axthomas-aie/CppSideProjects-AIE
 #include <string>
 #include <fstream>
 
-#define WIDTH 200
-#define HEIGHT 80
+#define WIDTH 80
+#define HEIGHT 40
 
 bool isRunning = true;
 

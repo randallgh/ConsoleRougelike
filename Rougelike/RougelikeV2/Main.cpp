@@ -12,8 +12,6 @@
 #include "PlayerManager.h"
 #include "EnemyManager.h"
 #include "GameManager.h"
-//#include "Player.h"
-//#include "Enemy.h"
 
 #include "Message.h"
 #include "MessageBoxUI.h"

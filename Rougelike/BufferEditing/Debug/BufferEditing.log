@@ -2,5 +2,6 @@
   Main.cpp
 c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(107): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
 c:\users\s179056\documents\repos\consolerougelike\rougelike\bufferediting\main.cpp(136): warning C4018: '<': signed/unsigned mismatch
+Main.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/OPT:LBR' specification
   BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Editor.exe
   BufferEditing.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Debug\Editor.pdb (Partial PDB)
