@@ -12,7 +12,8 @@ class NPC
 public:
 	NPC();
 	NPC(NPC * npc);
-	NPC(char c, WORD cc, std::string name, int heal, int atck, int dexterity, int level);
+	NPC(char c, WORD cc, std::string name, int health, int attack, int dexterity, int level);
+	NPC(char c, WORD cc, std::string name, int heal, int attack, int dexterity, int level, int exp);
 	~NPC();
 
 	//Visual

@@ -29,16 +29,16 @@ bool isRunning = true;
 
 /*-----Map-----*/
 //char mapData[WIDTH * MAPHEIGHT];
-GameObject levelData[WIN_WIDTH * MAP_HEIGHT];
+GameObject * levelData = new GameObject[WIN_WIDTH * MAP_HEIGHT];
 
-char ground = ' ';//249;
-char wall = 178;
+const char ground = ' ';//249;
+const char wall = 178;
 
 int level = 1;
 std::string currentMap = "level1";
 
 /*-----UI-----*/
-char uiData[WIN_WIDTH * UI_HEIGHT];
+char * uiData = new char[WIN_WIDTH * UI_HEIGHT];
 
 Vector2D playerHealthUIStart = { 59, 8 };
 
@@ -70,6 +70,7 @@ void physics();
 
 //Random
 bool didProc(int prob);
+void loadEnemies();
 
 //UI
 void printUI();
@@ -77,6 +78,9 @@ void printUI();
 //Map
 void outputMapFromMem(std::string fileName);
 void importMapFromFile(std::string fileName);
+void savePlayerData(std::string fileName);
+void loadPlayerData();
+
 
 void help() 
 {
@@ -105,10 +109,10 @@ int main()
 			levelData[x + WIN_WIDTH * y].position = { x,y };
 		}
 	}
-
+	loadPlayerData();
 
 	printUI();
-
+	loadEnemies();
 	importMapFromFile(currentMap);
 	//importMapFromFile("maps/map.txt");
 	playerManager.data.arrows = 10;
@@ -157,6 +161,17 @@ int main()
 
 		Sleep(100);
 	}
+
+	if (playerManager.player.isAlive) 
+	{
+		outputMapFromMem("data/maps/mapSave.txt");
+		savePlayerData("saves/playerSave.txt");
+	}
+
+	delete[] levelData;
+	delete[] uiData;
+
+	return 0;
 }
 
 //Takes whatever is in mapData and adds it to the console buffer
@@ -694,7 +709,7 @@ void physics() {
 
 void importMapFromFile(std::string fileName) 
 {
-	std::string destination = "maps/" + fileName + ".txt";
+	std::string destination = "data/maps/" + fileName + ".txt";
 
 	for (int i = 0; i < enemyManager.getMaxEnemies(); ++i)
 	{
@@ -737,14 +752,6 @@ void importMapFromFile(std::string fileName)
 	S - add a enemy at that position
 	*/
 
-	NPC slime('S', 11, "Blue Slime", 20, 10, 80, 1);
-	NPC greenSlime('S', 10, "Green Slime", 20, 5, 80, 1);
-	NPC dragon('D', 12, "Dragon", 300, 10, 80, 5);
-
-	slime.exp = 30;
-	greenSlime.exp = 15;
-	dragon.exp = 100;
-
 	for (int y = 0; y < MAP_HEIGHT; ++y) 
 	{
 		for (int x = 0; x < WIN_WIDTH; ++x) 
@@ -756,11 +763,11 @@ void importMapFromFile(std::string fileName)
 				break;
 			case 'S':
 				//messageBox.Add(Message("Add enemy"));
-				enemyManager.addEnemy(slime, { x,y });
+				enemyManager.addEnemy(enemyManager.getEnemyData("Blue Slime"), { x,y });
 
 				break;
 			case 'D':
-				enemyManager.addEnemy(dragon, { x,y });
+				enemyManager.addEnemy(enemyManager.getEnemyData("Red Dragon"), { x,y });
 				break;
 			case 'w':
 				levelData[x + WIN_WIDTH * y].character = wall;
@@ -785,6 +792,22 @@ void importMapFromFile(std::string fileName)
 
 void outputMapFromMem(std::string fileName) 
 {
+	for (int y = 0; y < MAP_HEIGHT; ++y)
+	{
+		for (int x = 0; x < WIN_WIDTH; ++x)
+		{
+			switch (levelData[x + WIN_WIDTH * y].character)
+			{
+			case wall:
+				levelData[x + WIN_WIDTH * y].character = 'w';
+				break;
+			case ground:
+				levelData[x + WIN_WIDTH * y].character = '.';
+				break;
+			}
+		}
+	}
+
 	std::string outputMapString;
 	std::ofstream output;
 	char outputCharA[WIN_WIDTH * MAP_HEIGHT] = { ' ' };
@@ -797,7 +820,108 @@ void outputMapFromMem(std::string fileName)
 		}
 		output << outputCharA << "\n";
 	}
+	output.flush();
+	output.close();
+}
 
+void savePlayerData(std::string fileName)
+{
+	std::ofstream file;
+
+	file.open(fileName);
+
+
+	file << playerManager.player.isAlive << "\n";
+	file << level << "\n";
+	//Player Data
+	file << playerManager.data.exp << "\n";
+	file << playerManager.data.expToNextLevel << "\n";
+
+	file << playerManager.data.arrows << "\n";
+	file << playerManager.data.potions << "\n";
+
+	//Player NPC
+	file << playerManager.player.health << "\n";
+	file << playerManager.player.maxHealth << "\n";
+	file << playerManager.player.attack << "\n";
+	//file << playerManager.player.defense << "\n";
+	file << playerManager.player.level << "\n";
+	//Pos
+	file << playerManager.player.position.x << "\n";
+	file << playerManager.player.position.y << "\n";
+
+
+	file.flush();
+	file.close();
+
+}
+
+void loadPlayerData()
+{
+	std::ifstream player;
+	std::string buffer;
+	player.open("saves/playerSave.txt");
+
+	/*	file << playerManager.player.isAlive << "\n";
+	//Player Data
+	file << playerManager.data.exp << "\n";
+	file << playerManager.data.expToNextLevel << "\n";
+
+	file << playerManager.data.arrows << "\n";
+	file << playerManager.data.potions << "\n";
+
+	//Player NPC
+	file << playerManager.player.health << "\n";
+	file << playerManager.player.maxHealth << "\n";
+	file << playerManager.player.attack << "\n";
+	//file << playerManager.player.defense << "\n";
+	file << playerManager.player.level << "\n";
+	//Pos
+	file << playerManager.player.position.x << "\n";
+	file << playerManager.player.position.y << "\n";*/
+
+
+	if (!player.fail())
+	{
+		getline(player, buffer);
+		if (std::stoi(buffer) == 1)
+		{
+			getline(player, buffer);
+			level = std::stoi(buffer);
+			getline(player, buffer);
+			int exp = std::stoi(buffer);
+			getline(player, buffer);
+			int expToNextLevel = std::stoi(buffer);
+
+			getline(player, buffer);
+			int arrows = std::stoi(buffer);
+			getline(player, buffer);
+			int potions = std::stoi(buffer);
+
+			playerManager.data.exp = exp;
+			playerManager.data.expToNextLevel = expToNextLevel;
+			playerManager.data.arrows = arrows;
+			playerManager.data.potions = potions;
+
+			getline(player, buffer);
+			int health = std::stoi(buffer);
+			getline(player, buffer);
+			int maxHealth = std::stoi(buffer);
+			getline(player, buffer);
+			int attack = std::stoi(buffer);
+			getline(player, buffer);
+			int level = std::stoi(buffer);
+
+			playerManager.player.attack = attack;
+			playerManager.player.health = health;
+			playerManager.player.maxHealth = maxHealth;
+			playerManager.player.level = level;
+
+			currentMap = "mapSave";
+
+		}
+	}
+	player.close();
 }
 
 void printUI() 
@@ -838,4 +962,85 @@ bool didProc(int prob)
 	}
 
 	return false;
+}
+
+void loadEnemies()
+{
+	//Replace this line with reading in enemy info in from file
+	//NPC slime('S', 11, "Blue Slime", 20, 10, 80, 1, 30);
+	//NPC greenSlime('S', 10, "Green Slime", 20, 5, 80, 1, 15);
+	//NPC dragon('D', 12, "Dragon", 300, 10, 80, 5, 200);
+	//enemyManager.addDatabase(slime);
+	//enemyManager.addDatabase(greenSlime);
+	//enemyManager.addDatabase(dragon);
+
+	std::string enemyFile = "data/enemies.txt";
+	std::fstream file;
+
+	file.open(enemyFile);
+	if (file.fail())
+	{
+		messageBox.Add(Message("ENEMY FILE NOT FOUND"));
+		return;
+	}
+
+	std::string name = "null";
+	char c = 'c';
+	WORD color = 15;
+	int health = 0;
+	int attack = 0;
+	int dexterity = 0;
+	int level = 0;
+	int exp = 0;
+
+
+	std::string buffer = "null";
+	while (getline(file, buffer))
+	{
+		if (buffer.size() > 0) 
+		{
+			if (buffer.at(0) == '@')
+			{
+				getline(file, buffer);
+				name = buffer;
+
+				getline(file, buffer);
+				if (buffer.compare("BLUE") == 0)
+				{
+					color = 11;
+				}
+				else if (buffer.compare("RED") == 0)
+				{
+					color = 12;
+				}
+				else if (buffer.compare("GREEN") == 0)
+				{
+					color = 10;
+				}
+
+				getline(file, buffer);
+				c = buffer.at(0);
+
+				getline(file, buffer);
+				health = std::stoi(buffer);
+
+				getline(file, buffer);
+				attack = std::stoi(buffer);
+
+				getline(file, buffer);
+				dexterity = std::stoi(buffer);
+
+				getline(file, buffer);
+				level = std::stoi(buffer);
+
+				getline(file, buffer);
+				exp = std::stoi(buffer);
+
+				messageBox.Add(Message("Loaded " + name + " C: " + c));
+				enemyManager.addDatabase(new NPC(c, color, name, health, attack, dexterity, level, exp));
+			}
+		}
+	}
+
+	file.close();
 }

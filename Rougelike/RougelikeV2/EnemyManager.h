@@ -6,21 +6,27 @@
 #include "GameManager.h"
 #include "GameObject.h"
 
+#include <string>
+
 class EnemyManager
 {
 public:
 
 	#define MAXENEMIES 30
+	#define DATABASESIZE 100
 
 	//enemies char
 	NPC enemies[MAXENEMIES];
+	NPC database[DATABASESIZE];
 
 	//Getters
 	int getMaxEnemies();
 
 	bool addEnemy(NPC npc, Vector2D pos);
-	//TODO
-	//void addEnemyToDatabase(NPC npc);
+	//database
+	void addDatabase(NPC npc);
+	NPC getEnemyData(std::string name);
+
 	void printEnemies();
 	bool areAllDead();
 

@@ -89,6 +89,32 @@ bool EnemyManager::addEnemy(NPC npc, Vector2D pos)
 	return false;
 }
 
+void EnemyManager::addDatabase(NPC npc)
+{
+	for (int i = 0; i < DATABASESIZE; ++i)
+	{
+		if (this->database[i].isAlive == false)
+		{
+			//messageBox->Add(Message("Placed " + npc.name + " at " + std::to_string(i) + " index."));
+			database[i] = npc;
+			return;
+		}
+	}
+}
+
+NPC EnemyManager::getEnemyData(std::string name)
+{
+	for (int i = 0; i < DATABASESIZE; ++i)
+	{
+		if (name.compare(this->database[i].name) == 0)
+		{
+			return database[i];
+		}
+	}
+	messageBox->Add(Message("WARNING: " + name + " IS AN INVALID NPC"));
+	return NPC();
+}
+
 void EnemyManager::printEnemies()
 {
 	for (NPC element : this->enemies) {

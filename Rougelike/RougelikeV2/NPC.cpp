@@ -32,21 +32,43 @@ NPC::NPC(NPC * npc)
 }
 
 
-NPC::NPC(char c, WORD cc, std::string name, int heal, int atck, int dexterity, int level)
+NPC::NPC(char c, WORD cc, std::string name, int health, int attack, int dexterity, int level)
 {
 	this->character = c;
 	this->color = cc;
 	this->name = name;
 
-	this->health = heal;
-	this->maxHealth = heal;
+	this->health = health;
+	this->maxHealth = health;
 
 	this->dexterity = dexterity;
 
-	this->attack = atck;
+	this->attack = attack;
 	this->level = level;
 
 	this->isAlive = true;
+
+	this->position = { 0,0 };
+	this->positionPrevious = { 0,0 };
+}
+
+NPC::NPC(char c, WORD cc, std::string name, int health, int attack, int dexterity, int level, int exp)
+{
+	this->character = c;
+	this->color = cc;
+	this->name = name;
+
+	this->health = health;
+	this->maxHealth = health;
+
+	this->dexterity = dexterity;
+
+	this->attack = attack;
+	this->level = level;
+
+	this->isAlive = true;
+
+	this->exp = exp;
 
 	this->position = { 0,0 };
 	this->positionPrevious = { 0,0 };
