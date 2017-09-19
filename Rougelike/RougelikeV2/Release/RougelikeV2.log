@@ -7,17 +7,17 @@ c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageB
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\Message.h(4): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\MessageBoxUI.h(5): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 c:\users\s179056\documents\repos\consolerougelike\rougelike\rougelikev2\GameObject.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-Main.cpp(35): warning C4309: 'initializing': truncation of constant value
-Main.cpp(97): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-Main.cpp(274): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-Main.cpp(298): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-Main.cpp(934): warning C4309: '=': truncation of constant value
-Main.cpp(940): warning C4309: '=': truncation of constant value
-Main.cpp(943): warning C4309: '=': truncation of constant value
+Main.cpp(33): warning C4309: 'initializing': truncation of constant value
+Main.cpp(95): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Main.cpp(272): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+Main.cpp(296): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+Main.cpp(936): warning C4309: '=': truncation of constant value
+Main.cpp(942): warning C4309: '=': truncation of constant value
+Main.cpp(945): warning C4309: '=': truncation of constant value
   Generating code
-  18 of 309 functions ( 5.8%) were compiled, the rest were copied from previous compilation.
+  2 of 309 functions ( 0.6%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    66 functions had inline decision re-evaluated but remain unchanged
+    19 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Game.exe
   RougelikeV2.vcxproj -> C:\Users\s179056\Documents\repos\ConsoleRougelike\Rougelike\Release\Game.pdb (Full PDB)

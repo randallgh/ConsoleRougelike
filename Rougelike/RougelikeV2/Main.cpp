@@ -671,6 +671,10 @@ void physics() {
 		if (levelData[pos].character == wall) 
 		{
 			enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
+		} 
+		else if (levelData[pos].character == '>')
+		{
+			enemyManager.enemies[i].setPosition(enemyManager.enemies[i].positionPrevious);
 		}
 	}
 
